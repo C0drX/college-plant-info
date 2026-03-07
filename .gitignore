@@ -5,3 +5,5 @@ build
 uploads
 backend/images/*
 backend/images/.gitkeep
+backend/qrcodes/*
+backend/qrcodes/.gitkeep

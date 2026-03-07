@@ -1,6 +1,7 @@
 const db = require("../config/db");
 const fs = require("fs");
 const path = require("path");
+const generatePlantQR = require("../services/qrService");
 
 // Get all plants
 exports.getAllPlants = (req, res) => {
@@ -48,14 +49,37 @@ exports.addPlant = (req, res) => {
   db.query(
     sql,
     [common_name, scientific_name, family, description, uses, location, image],
-    (err, result) => {
+    async (err, result) => {
 
-      if (err) return res.status(500).json(err);
+      if (err) {
+        return res.status(500).json({
+          error: "Database insert failed",
+          details: err
+        });
+      }
 
-      res.json({
-        message: "Plant added with image",
-        image: image
-      });
+      try {
+
+        const plantId = result.insertId;
+
+        // QR generate
+        const qrFile = await generatePlantQR(plantId);
+
+        res.json({
+          message: "Plant added successfully",
+          plantId: plantId,
+          image: image ? `/images/${image}` : null,
+          qr: `/qrcodes/${qrFile}`
+        });
+
+      } catch (qrError) {
+
+        res.status(500).json({
+          error: "Plant inserted but QR generation failed",
+          details: qrError
+        });
+
+      }
 
     }
   );
