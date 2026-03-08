@@ -12,6 +12,7 @@ app.use(express.json());
 
 //* For uploading images
 app.use("/images", express.static("images"));
+app.use("/qrcodes", express.static("qrcodes"));
 
 //* for defining routes
 app.use("/api/plants", plantRoutes);
