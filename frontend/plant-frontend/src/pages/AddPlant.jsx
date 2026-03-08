@@ -14,7 +14,17 @@ function AddPlant() {
     location: "",
   });
 
-  const [image, setImage] = useState(null);
+  const [images, setImages] = useState({
+    cover: null,
+    reference: null,
+    college: null,
+  });
+
+  const [preview, setPreview] = useState({
+    cover: null,
+    reference: null,
+    college: null,
+  });
 
   const handleChange = (e) => {
     setForm({
@@ -24,7 +34,20 @@ function AddPlant() {
   };
 
   const handleImage = (e) => {
-    setImage(e.target.files[0]);
+    const { name, files } = e.target;
+    const file = files[0];
+
+    if (!file) return;
+
+    setImages({
+      ...images,
+      [name]: file,
+    });
+
+    setPreview({
+      ...preview,
+      [name]: URL.createObjectURL(file),
+    });
   };
 
   const handleSubmit = async (e) => {
@@ -36,7 +59,9 @@ function AddPlant() {
       formData.append(key, form[key]);
     });
 
-    formData.append("image", image);
+    if (images.cover) formData.append("cover", images.cover);
+    if (images.reference) formData.append("reference", images.reference);
+    if (images.college) formData.append("college", images.college);
 
     try {
       await addPlant(formData);
@@ -114,26 +139,64 @@ function AddPlant() {
         </div>
 
         <div className="mb-3">
-          <label className="form-label">Plant Image</label>
+          <label className="form-label">Cover Image</label>
+
           <input
             type="file"
+            name="cover"
             className="form-control"
             onChange={handleImage}
             required
           />
-        </div>
 
-        {image && (
-          <div className="mt-3">
-            <p>Preview:</p>
+          {preview.cover && (
             <img
-              src={URL.createObjectURL(image)}
-              alt="preview"
-              className="img-thumbnail"
+              src={preview.cover}
+              className="img-thumbnail mt-2"
               style={{ maxWidth: "250px" }}
             />
-          </div>
-        )}
+          )}
+        </div>
+
+        <div className="mb-3">
+          <label className="form-label">Reference Image</label>
+
+          <input
+            type="file"
+            name="reference"
+            className="form-control"
+            onChange={handleImage}
+            required
+          />
+
+          {preview.reference && (
+            <img
+              src={preview.reference}
+              className="img-thumbnail mt-2"
+              style={{ maxWidth: "150px", borderRadius: "50%" }}
+            />
+          )}
+        </div>
+
+        <div className="mb-3">
+          <label className="form-label">College Location Image</label>
+
+          <input
+            type="file"
+            name="college"
+            className="form-control"
+            onChange={handleImage}
+            required
+          />
+
+          {preview.college && (
+            <img
+              src={preview.college}
+              className="img-thumbnail mt-2"
+              style={{ maxWidth: "250px" }}
+            />
+          )}
+        </div>
 
         <button className="btn btn-success">Add Plant</button>
       </form>

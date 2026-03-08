@@ -5,12 +5,33 @@ const generatePlantQR = require("../services/qrService");
 
 // Get all plants
 exports.getAllPlants = (req, res) => {
-  const sql = "SELECT * FROM plants";
+  const sql = `
+    SELECT 
+      p.id,
+      p.common_name,
+      p.scientific_name,
+      p.family,
+      p.location,
+      MIN(pi.image_path) AS cover_image
+    FROM plants p
+    LEFT JOIN plant_images pi 
+      ON p.id = pi.plant_id
+    GROUP BY p.id
+    ORDER BY p.id DESC
+  `;
 
-  db.query(sql, (err, result) => {
-    if (err) return res.status(500).json(err);
+  db.query(sql, (err, results) => {
+    if (err) {
+      return res.status(500).json(err);
+    }
 
-    res.json(result);
+    // cover_image ko full path bana dete hain
+    const plants = results.map((p) => ({
+      ...p,
+      cover_image: p.cover_image ? `/images/${p.cover_image}` : null,
+    }));
+
+    res.json(plants);
   });
 };
 
@@ -18,12 +39,26 @@ exports.getAllPlants = (req, res) => {
 exports.getPlantById = (req, res) => {
   const id = req.params.id;
 
-  const sql = "SELECT * FROM plants WHERE id = ?";
+  const plantQuery = "SELECT * FROM plants WHERE id = ?";
 
-  db.query(sql, [id], (err, result) => {
+  db.query(plantQuery, [id], (err, plantResult) => {
     if (err) return res.status(500).json(err);
 
-    res.json(result[0]);
+    if (plantResult.length === 0) {
+      return res.status(404).json({ message: "Plant not found" });
+    }
+
+    const plant = plantResult[0];
+
+    const imageQuery = "SELECT image_path FROM plant_images WHERE plant_id = ?";
+
+    db.query(imageQuery, [id], (err, images) => {
+      if (err) return res.status(500).json(err);
+
+      plant.images = images.map((img) => `/images/${img.image_path}`);
+
+      res.json(plant);
+    });
   });
 };
 
@@ -32,40 +67,71 @@ exports.addPlant = (req, res) => {
   const { common_name, scientific_name, family, description, uses, location } =
     req.body;
 
-  const image = req.file ? req.file.filename : null;
-
   const sql = `
   INSERT INTO plants
-  (common_name, scientific_name, family, description, uses, location, image)
-  VALUES (?, ?, ?, ?, ?, ?, ?)
+  (common_name, scientific_name, family, description, uses, location)
+  VALUES (?, ?, ?, ?, ?, ?)
   `;
 
   db.query(
     sql,
-    [common_name, scientific_name, family, description, uses, location, image],
+    [common_name, scientific_name, family, description, uses, location],
     async (err, result) => {
       if (err) {
-        return res.status(500).json({
-          error: "Database insert failed",
-          details: err,
+        return res.status(500).json(err);
+      }
+
+      const plantId = result.insertId;
+
+      const imageValues = [];
+
+      const processImage = (file, type) => {
+        const ext = path.extname(file.originalname);
+
+        const newName = `plant-${plantId}-${type}${ext}`;
+
+        const oldPath = path.join(__dirname, "..", "images", file.filename);
+        const newPath = path.join(__dirname, "..", "images", newName);
+
+        fs.renameSync(oldPath, newPath);
+
+        imageValues.push([plantId, newName, type]);
+      };
+
+      if (req.files?.cover) {
+        processImage(req.files.cover[0], "cover");
+      }
+
+      if (req.files?.college) {
+        processImage(req.files.college[0], "college");
+      }
+
+      if (req.files?.reference) {
+        processImage(req.files.reference[0], "reference");
+      }
+
+      if (imageValues.length > 0) {
+        const imageQuery = `
+        INSERT INTO plant_images (plant_id, image_path, image_type)
+        VALUES ?
+        `;
+
+        db.query(imageQuery, [imageValues], (err) => {
+          if (err) console.log("Image insert error:", err);
         });
       }
 
       try {
-        const plantId = result.insertId;
-
-        // QR generate
         const qrFile = await generatePlantQR(plantId);
 
         res.json({
           message: "Plant added successfully",
           plantId: plantId,
-          image: image ? `/images/${image}` : null,
-          qr: `/qrcodes/${qrFile}`,
+          qr: `/qrcodes/plant-${plantId}.png`,
         });
       } catch (qrError) {
         res.status(500).json({
-          error: "Plant inserted but QR generation failed",
+          error: "QR generation failed",
           details: qrError,
         });
       }
@@ -148,32 +214,26 @@ exports.updatePlant = (req, res) => {
 exports.deletePlant = (req, res) => {
   const plantId = req.params.id;
 
-  // Pehle plant fetch karo
-  const getPlantQuery = "SELECT * FROM plants WHERE id = ?";
+  // Step 1: plant images fetch karo
+  const imageQuery = "SELECT image_path FROM plant_images WHERE plant_id = ?";
 
-  db.query(getPlantQuery, [plantId], (err, result) => {
+  db.query(imageQuery, [plantId], (err, images) => {
     if (err) {
-      return res.status(500).json({ error: err });
+      return res.status(500).json(err);
     }
 
-    if (result.length === 0) {
-      return res.status(404).json({ message: "Plant not found" });
-    }
-
-    const plant = result[0];
-
-    // Image delete
-    if (plant.image) {
-      const imagePath = path.join(__dirname, "..", "images", plant.image);
+    // Step 2: images delete karo
+    images.forEach((img) => {
+      const imagePath = path.join(__dirname, "..", "images", img.image_path);
 
       fs.unlink(imagePath, (err) => {
         if (err) {
           console.log("Image delete error:", err.message);
         }
       });
-    }
+    });
 
-    // QR delete
+    // Step 3: QR delete
     const qrPath = path.join(
       __dirname,
       "..",
@@ -187,16 +247,16 @@ exports.deletePlant = (req, res) => {
       }
     });
 
-    // Ab DB se delete karo
-    const deleteQuery = "DELETE FROM plants WHERE id = ?";
+    // Step 4: DB se plant delete
+    const deletePlantQuery = "DELETE FROM plants WHERE id = ?";
 
-    db.query(deleteQuery, [plantId], (err) => {
+    db.query(deletePlantQuery, [plantId], (err) => {
       if (err) {
-        return res.status(500).json({ error: err });
+        return res.status(500).json(err);
       }
 
       res.json({
-        message: "Plant and related files deleted successfully",
+        message: "Plant and all related files deleted successfully",
       });
     });
   });

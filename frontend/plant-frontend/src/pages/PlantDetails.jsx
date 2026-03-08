@@ -22,43 +22,96 @@ function PlantDetails() {
   };
 
   if (!plant) {
-    return <div className="container mt-4">Loading...</div>;
+    return (
+      <div className="container mt-5 text-center">
+        Loading plant information...
+      </div>
+    );
   }
+
+  // Extract images from array
+  const coverImage = plant.images?.find((img) => img.includes("cover"));
+  const referenceImage = plant.images?.find((img) => img.includes("reference"));
+  const collegeImage = plant.images?.find((img) => img.includes("college"));
 
   return (
     <div className="container mt-4">
-      <div className="row">
-        <div className="col-md-6">
+      {/* HERO IMAGE */}
+
+      {coverImage && (
+        <img
+          src={`${BASE_URL}${coverImage}`}
+          className="img-fluid w-100 mb-4 rounded shadow"
+          style={{
+            maxHeight: "420px",
+            objectFit: "cover",
+          }}
+          alt={plant.common_name}
+        />
+      )}
+
+      {/* PROFILE STYLE HEADER */}
+
+      <div className="d-flex align-items-center mb-4">
+        {referenceImage && (
           <img
-            src={`${BASE_URL}/images/${plant.image}`}
-            className="img-fluid rounded shadow"
-            alt={plant.common_name}
+            src={`${BASE_URL}${referenceImage}`}
+            alt="reference"
+            style={{
+              width: "110px",
+              height: "110px",
+              borderRadius: "50%",
+              objectFit: "cover",
+              marginRight: "20px",
+            }}
           />
-        </div>
+        )}
 
-        <div className="col-md-6">
-          <h2>{plant.common_name}</h2>
+        <div>
+          <h2 className="mb-1">{plant.common_name}</h2>
 
-          <p>
-            <strong>Scientific Name:</strong> {plant.scientific_name}
-          </p>
+          <p className="text-muted mb-1">{plant.scientific_name}</p>
 
-          <p>
+          <p className="mb-0">
             <strong>Family:</strong> {plant.family}
           </p>
-
-          <p>
-            <strong>Description:</strong> {plant.description}
-          </p>
-
-          <p>
-            <strong>Uses:</strong> {plant.uses}
-          </p>
-
-          <p>
-            <strong>Location:</strong> {plant.location}
-          </p>
         </div>
+      </div>
+
+      {/* DESCRIPTION */}
+
+      <div className="mb-4">
+        <h4>Description</h4>
+
+        <p style={{ whiteSpace: "pre-line" }}>{plant.description}</p>
+      </div>
+
+      {/* USES */}
+
+      <div className="mb-4">
+        <h4>Uses</h4>
+
+        <p style={{ whiteSpace: "pre-line" }}>{plant.uses}</p>
+      </div>
+
+      {/* LOCATION */}
+
+      <div className="mb-4">
+        <h4>Location in College</h4>
+
+        <p>{plant.location}</p>
+
+        {collegeImage && (
+          <img
+            src={`${BASE_URL}${collegeImage}`}
+            alt="college location"
+            className="img-fluid rounded shadow"
+            style={{
+              maxHeight: "420px",
+              objectFit: "cover",
+            }}
+          />
+        )}
       </div>
     </div>
   );
