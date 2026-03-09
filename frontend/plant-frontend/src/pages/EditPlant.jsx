@@ -13,6 +13,7 @@ function EditPlant() {
     family: "",
     description: "",
     uses: "",
+    origin: "",
     location: "",
   });
 
@@ -44,6 +45,7 @@ function EditPlant() {
         description: plant.description || "",
         uses: plant.uses || "",
         location: plant.location || "",
+        origin: plant.origin || "",
       });
 
       // Extract images
@@ -166,6 +168,16 @@ function EditPlant() {
             name="uses"
             rows="4"
             value={form.uses}
+            onChange={handleChange}
+          />
+        </div>
+        <div className="mb-3">
+          <label className="form-label">Origin</label>
+          <input
+            type="text"
+            className="form-control"
+            name="origin"
+            value={form.origin}
             onChange={handleChange}
           />
         </div>

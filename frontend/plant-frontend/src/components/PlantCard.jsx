@@ -9,17 +9,20 @@ function PlantCard({ plant }) {
           className="card-img-top"
           alt={plant.common_name}
           style={{
-            height: "220px",
+            height: "330px",
+
             objectFit: "cover",
           }}
         />
 
         <div className="card-body">
-          <h5 className="card-title">{plant.common_name}</h5>
+          <h2 className="card-title"> {plant.common_name}</h2>
 
-          <p className="text-muted mb-2">{plant.scientific_name}</p>
+          <p className="text-muted mb-2" style={{ fontSize: "14px" }}>
+            {plant.scientific_name}
+          </p>
 
-          <Link to={`/plant/${plant.id}`} className="btn btn-success btn-sm">
+          <Link to={`/plant/${plant.id}`} className="btn btn-success ">
             View Details
           </Link>
         </div>

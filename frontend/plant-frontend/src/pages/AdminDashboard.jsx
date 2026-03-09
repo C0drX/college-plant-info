@@ -1,32 +1,37 @@
 import { useEffect, useState } from "react";
 import { getPlants, deletePlant } from "../services/api";
 import { Link } from "react-router-dom";
-import QrModal from "../components/QrModal";
+import PlantList from "../components/PlantList";
+import QrModal from "../components/modals/QrModal";
+import DeleteModal from "../components/modals/DeleteModal";
 
 function AdminDashboard() {
   const [plants, setPlants] = useState([]);
   const [qrPlant, setQrPlant] = useState(null);
+  const [search, setSearch] = useState("");
+  const [deletePlantId, setDeletePlantId] = useState(null);
+
+  const filteredPlants = plants.filter((plant) =>
+    plant.common_name.toLowerCase().includes(search.toLowerCase()),
+  );
 
   useEffect(() => {
     loadPlants();
   }, []);
 
   const loadPlants = async () => {
-    try {
-      const res = await getPlants();
-      setPlants(res.data);
-    } catch (err) {
-      console.error(err);
-    }
+    const res = await getPlants();
+    setPlants(res.data);
   };
 
-  const handleDelete = async (id) => {
-    const confirmDelete = window.confirm("Delete this plant?");
-
-    if (!confirmDelete) return;
+  const confirmDelete = async () => {
+    if (!deletePlantId) return;
 
     try {
-      await deletePlant(id);
+      await deletePlant(deletePlantId);
+
+      setDeletePlantId(null);
+
       loadPlants();
     } catch (err) {
       console.error(err);
@@ -34,57 +39,41 @@ function AdminDashboard() {
   };
 
   return (
-    <div className="container mt-4">
-      <div className="d-flex justify-content-between mb-3">
-        <h2>Admin Dashboard</h2>
+    <div className="container py-4">
+      <div className="card shadow-sm border-0">
+        <div className="card-header bg-white d-flex justify-content-between align-items-center">
+          <h6 className="mb-0">
+            Total Plants : <b>{plants.length}</b>
+          </h6>
 
-        <Link to="/admin/add" className="btn btn-success">
-          Add Plant
-        </Link>
+          <div className="d-flex gap-2">
+            <input
+              type="text"
+              className="form-control form-control-sm"
+              placeholder="Search plant..."
+              style={{ width: "200px" }}
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+
+            <Link to="/admin/add" className="btn btn-success btn-sm">
+              + Add Plant
+            </Link>
+          </div>
+        </div>
+        <div className="card-body">
+          <PlantList
+            plants={filteredPlants}
+            onDelete={setDeletePlantId}
+            onShowQr={setQrPlant}
+          />
+        </div>
       </div>
-
-      <table className="table table-bordered">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Scientific Name</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          {plants.map((plant) => (
-            <tr key={plant.id}>
-              <td>{plant.common_name}</td>
-
-              <td>{plant.scientific_name}</td>
-
-              <td>
-                <Link
-                  to={`/admin/edit/${plant.id}`}
-                  className="btn btn-warning me-2"
-                >
-                  Edit
-                </Link>
-
-                <button
-                  onClick={() => handleDelete(plant.id)}
-                  className="btn btn-danger"
-                >
-                  Delete
-                </button>
-
-                <button
-                  className="btn btn-info me-2"
-                  onClick={() => setQrPlant(plant)}
-                >
-                  Show QR
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <DeleteModal
+        show={deletePlantId}
+        onClose={() => setDeletePlantId(null)}
+        onConfirm={confirmDelete}
+      />
       <QrModal plant={qrPlant} onClose={() => setQrPlant(null)} />
     </div>
   );
