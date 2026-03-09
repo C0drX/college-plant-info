@@ -10,6 +10,7 @@ exports.getAllPlants = (req, res) => {
       p.id,
       p.common_name,
       p.scientific_name,
+      p.origin,
       p.family,
       p.location,
       MIN(pi.image_path) AS cover_image
@@ -64,18 +65,25 @@ exports.getPlantById = (req, res) => {
 
 // Add plant
 exports.addPlant = (req, res) => {
-  const { common_name, scientific_name, family, description, uses, location } =
-    req.body;
+  const {
+    common_name,
+    scientific_name,
+    family,
+    description,
+    uses,
+    location,
+    origin,
+  } = req.body;
 
   const sql = `
   INSERT INTO plants
-  (common_name, scientific_name, family, description, uses, location)
-  VALUES (?, ?, ?, ?, ?, ?)
+  (common_name, scientific_name, family, description, uses, location, origin)
+  VALUES (?, ?, ?, ?, ?, ?, ?)
   `;
 
   db.query(
     sql,
-    [common_name, scientific_name, family, description, uses, location],
+    [common_name, scientific_name, family, description, uses, location, origin],
     async (err, result) => {
       if (err) {
         return res.status(500).json(err);
@@ -143,8 +151,15 @@ exports.addPlant = (req, res) => {
 exports.updatePlant = (req, res) => {
   const id = req.params.id;
 
-  const { common_name, scientific_name, family, description, uses, location } =
-    req.body;
+  const {
+    common_name,
+    scientific_name,
+    family,
+    description,
+    uses,
+    location,
+    origin,
+  } = req.body;
 
   const newImage = req.file ? req.file.filename : null;
 
@@ -178,11 +193,12 @@ exports.updatePlant = (req, res) => {
       uses: uses || plant.uses,
       location: location || plant.location,
       image: newImage || plant.image,
+      origin: origin || plant.origin,
     };
 
     const updateQuery = `
       UPDATE plants
-      SET common_name=?, scientific_name=?, family=?, description=?, uses=?, location=?, image=?
+      SET common_name=?, scientific_name=?, family=?, description=?, uses=?, location=?, image=?, origin=?
       WHERE id=?
     `;
 
@@ -196,6 +212,7 @@ exports.updatePlant = (req, res) => {
         updatedData.uses,
         updatedData.location,
         updatedData.image,
+        updatedData.origin,
         id,
       ],
       (err) => {

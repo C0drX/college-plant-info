@@ -11,6 +11,7 @@ function AddPlant() {
     family: "",
     description: "",
     uses: "",
+    origin: "",
     location: "",
   });
 
@@ -97,6 +98,7 @@ function AddPlant() {
             className="form-control"
             name="scientific_name"
             onChange={handleChange}
+            required
           />
         </div>
 
@@ -107,6 +109,7 @@ function AddPlant() {
             className="form-control"
             name="family"
             onChange={handleChange}
+            required
           />
         </div>
 
@@ -116,6 +119,7 @@ function AddPlant() {
             className="form-control"
             name="description"
             onChange={handleChange}
+            required
           />
         </div>
 
@@ -125,6 +129,17 @@ function AddPlant() {
             className="form-control"
             name="uses"
             onChange={handleChange}
+            required
+          />
+        </div>
+        <div className="mb-3">
+          <label className="form-label">Origin</label>
+          <input
+            type="text"
+            className="form-control"
+            name="origin"
+            onChange={handleChange}
+            required
           />
         </div>
 
@@ -135,6 +150,7 @@ function AddPlant() {
             className="form-control"
             name="location"
             onChange={handleChange}
+            required
           />
         </div>
 
