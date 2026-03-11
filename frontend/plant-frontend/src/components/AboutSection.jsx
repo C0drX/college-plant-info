@@ -1,7 +1,14 @@
-import React from "react";
+import { useState, useEffect } from "react";
 
-const AboutSection = ({ description }) => {
-  if (!description) return null;
+const AboutSection = ({ description, plantId }) => {
+  const [expanded, setExpanded] = useState(false);
+
+  const LIMIT = 300;
+  const showToggle = description.length > LIMIT;
+
+  useEffect(() => {
+    setExpanded(false);
+  }, [plantId]); // plant change hone par reset
 
   return (
     <div className="mb-5">
@@ -9,7 +16,22 @@ const AboutSection = ({ description }) => {
 
       <div className="card shadow-sm border-0">
         <div className="card-body">
-          <p className="mb-0 fs-6">{description}</p>
+          <p className={`mb-2 clamp-text ${expanded ? "expanded" : ""}`}>
+            {description}
+          </p>
+
+          {showToggle && (
+            <span
+              onClick={() => setExpanded(!expanded)}
+              style={{
+                color: "#2e7d32",
+                cursor: "pointer",
+                fontWeight: "500",
+              }}
+            >
+              {expanded ? "Read less" : "Read more"}
+            </span>
+          )}
         </div>
       </div>
     </div>

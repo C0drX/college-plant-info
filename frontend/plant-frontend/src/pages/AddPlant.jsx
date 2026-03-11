@@ -2,6 +2,10 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { addPlant } from "../services/api";
 
+import FormInput from "../components/FormInput";
+import FormTextarea from "../components/FormTextArea";
+import ImageUpload from "../components/ImageUpload";
+
 function AddPlant() {
   const navigate = useNavigate();
 
@@ -53,6 +57,10 @@ function AddPlant() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!images.cover || !images.reference || !images.college) {
+      alert("Please upload all plant images 🌿");
+      return;
+    }
 
     const formData = new FormData();
 
@@ -76,146 +84,142 @@ function AddPlant() {
   };
 
   return (
-    <div className="container mt-4">
-      <h2 className="mb-4">Add Plant</h2>
+    <div className="container py-4">
+      <div className="card shadow-lg border-0">
+        <div className="card-body p-4">
+          <h3 className="mb-4 fw-bold text-success">🌿 Add New Plant</h3>
 
-      <form onSubmit={handleSubmit}>
-        <div className="mb-3">
-          <label className="form-label">Plant Name</label>
-          <input
-            type="text"
-            className="form-control"
-            name="common_name"
-            onChange={handleChange}
-            required
-          />
+          <form onSubmit={handleSubmit}>
+            {/* Basic Info */}
+            <div className="card mb-4 border-0 shadow-sm">
+              <div className="card-body">
+                <h5 className="mb-3">Basic Information</h5>
+
+                <div className="row">
+                  <div className="col-md-6">
+                    <FormInput
+                      label="Plant Name"
+                      name="common_name"
+                      value={form.common_name}
+                      onChange={handleChange}
+                      required
+                    />
+                  </div>
+
+                  <div className="col-md-6">
+                    <FormInput
+                      label="Scientific Name"
+                      name="scientific_name"
+                      value={form.scientific_name}
+                      onChange={handleChange}
+                      required
+                    />
+                  </div>
+                </div>
+
+                <FormInput
+                  label="Family"
+                  name="family"
+                  value={form.family}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+            </div>
+
+            {/* Description */}
+            <div className="card mb-4 border-0 shadow-sm">
+              <div className="card-body">
+                <h5 className="mb-3">Plant Details</h5>
+
+                <FormTextarea
+                  label="Description"
+                  name="description"
+                  value={form.description}
+                  onChange={handleChange}
+                  required
+                />
+
+                <FormTextarea
+                  label="Uses"
+                  name="uses"
+                  value={form.uses}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+            </div>
+
+            {/* Origin + Location */}
+            <div className="card mb-4 border-0 shadow-sm">
+              <div className="card-body">
+                <h5 className="mb-3">Origin & Location</h5>
+
+                <div className="row">
+                  <div className="col-md-6">
+                    <FormInput
+                      label="Origin"
+                      name="origin"
+                      value={form.origin}
+                      onChange={handleChange}
+                      required
+                    />
+                  </div>
+
+                  <div className="col-md-6">
+                    <FormInput
+                      label="Location at College"
+                      name="location"
+                      value={form.location}
+                      onChange={handleChange}
+                      required
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Images */}
+            <div className="card mb-4 border-0 shadow-sm">
+              <div className="card-body">
+                <h5 className="mb-3">Plant Images</h5>
+
+                <div className="row">
+                  <ImageUpload
+                    label="Cover Image"
+                    name="cover"
+                    onChange={handleImage}
+                    preview={preview.cover}
+                  />
+
+                  <ImageUpload
+                    label="Reference Image"
+                    name="reference"
+                    onChange={handleImage}
+                    preview={preview.reference}
+                  />
+
+                  <ImageUpload
+                    label="College Location Image"
+                    name="college"
+                    onChange={handleImage}
+                    preview={preview.college}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="text-center mt-4">
+              <button
+                className="btn btn-success px-5 py-3 fw-semibold"
+                style={{ borderRadius: "10px", minWidth: "220px" }}
+              >
+                Add Plant
+              </button>
+            </div>
+          </form>
         </div>
-
-        <div className="mb-3">
-          <label className="form-label">Scientific Name</label>
-          <input
-            type="text"
-            className="form-control"
-            name="scientific_name"
-            onChange={handleChange}
-            required
-          />
-        </div>
-
-        <div className="mb-3">
-          <label className="form-label">Family</label>
-          <input
-            type="text"
-            className="form-control"
-            name="family"
-            onChange={handleChange}
-            required
-          />
-        </div>
-
-        <div className="mb-3">
-          <label className="form-label">Description</label>
-          <textarea
-            className="form-control"
-            name="description"
-            onChange={handleChange}
-            required
-          />
-        </div>
-
-        <div className="mb-3">
-          <label className="form-label">Uses</label>
-          <textarea
-            className="form-control"
-            name="uses"
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <div className="mb-3">
-          <label className="form-label">Origin</label>
-          <input
-            type="text"
-            className="form-control"
-            name="origin"
-            onChange={handleChange}
-            required
-          />
-        </div>
-
-        <div className="mb-3">
-          <label className="form-label">Location</label>
-          <input
-            type="text"
-            className="form-control"
-            name="location"
-            onChange={handleChange}
-            required
-          />
-        </div>
-
-        <div className="mb-3">
-          <label className="form-label">Cover Image</label>
-
-          <input
-            type="file"
-            name="cover"
-            className="form-control"
-            onChange={handleImage}
-            required
-          />
-
-          {preview.cover && (
-            <img
-              src={preview.cover}
-              className="img-thumbnail mt-2"
-              style={{ maxWidth: "250px" }}
-            />
-          )}
-        </div>
-
-        <div className="mb-3">
-          <label className="form-label">Reference Image</label>
-
-          <input
-            type="file"
-            name="reference"
-            className="form-control"
-            onChange={handleImage}
-            required
-          />
-
-          {preview.reference && (
-            <img
-              src={preview.reference}
-              className="img-thumbnail mt-2"
-              style={{ maxWidth: "150px", borderRadius: "50%" }}
-            />
-          )}
-        </div>
-
-        <div className="mb-3">
-          <label className="form-label">College Location Image</label>
-
-          <input
-            type="file"
-            name="college"
-            className="form-control"
-            onChange={handleImage}
-            required
-          />
-
-          {preview.college && (
-            <img
-              src={preview.college}
-              className="img-thumbnail mt-2"
-              style={{ maxWidth: "250px" }}
-            />
-          )}
-        </div>
-
-        <button className="btn btn-success">Add Plant</button>
-      </form>
+      </div>
     </div>
   );
 }

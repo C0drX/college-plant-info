@@ -130,16 +130,28 @@ import LocationSection from "../components/LocationSection";
 import { API_URL } from "../config/server";
 import { useParams } from "react-router-dom";
 import { motion } from "framer-motion";
+import MorePlants from "../components/MorePlants";
 
 const PlantDetails = () => {
   const [plant, setPlant] = useState(null);
   const { id } = useParams();
 
+  const [plants, setPlants] = useState([]);
+  useEffect(() => {
+    fetch(`${API_URL}/plants`)
+      .then((res) => res.json())
+      .then((data) => setPlants(data));
+  }, []);
+
   useEffect(() => {
     fetch(`${API_URL}/plants/${id}`)
       .then((res) => res.json())
       .then((data) => setPlant(data));
-  }, []);
+  }, [id]);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [id]);
 
   const containerVariant = {
     hidden: {},
@@ -190,7 +202,7 @@ const PlantDetails = () => {
         viewport={{ once: true, margin: "-100px" }}
         className="mb-5"
       >
-        <AboutSection description={plant.description} />
+        <AboutSection description={plant.description} plantId={id} />
       </motion.div>
 
       <motion.div
@@ -200,7 +212,7 @@ const PlantDetails = () => {
         viewport={{ once: true, margin: "-100px" }}
         className="mb-5"
       >
-        <UsesSection uses={plant.uses} />
+        <UsesSection uses={plant.uses} plantId={id} />
       </motion.div>
 
       <motion.div
@@ -221,6 +233,16 @@ const PlantDetails = () => {
         className="mb-5"
       >
         <LocationSection plant={plant} />
+      </motion.div>
+
+      <motion.div
+        variants={sectionVariant}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: "-100px" }}
+        className="mb-5"
+      >
+        <MorePlants plants={plants} currentPlantId={plant.id} />
       </motion.div>
     </div>
   );

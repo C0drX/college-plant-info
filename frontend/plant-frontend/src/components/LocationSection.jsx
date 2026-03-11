@@ -7,30 +7,21 @@ const LocationSection = ({ plant }) => {
     <div className="mb-5">
       <h3 className="mb-4 fw-bold text-success">📍 Location in College</h3>
 
-      <div className="card shadow-sm border-0 overflow-hidden">
-        <div className="row g-0">
-          <div className="col-md-6">
-            <img
-              src={`${BASE_URL}${collegeImage}`}
-              className="img-fluid w-100"
-              style={{
-                minHeight: "350px",
-                height: "100%",
-                objectFit: "cover",
-              }}
-            />
+      <div className="card shadow-sm border-0 location-card">
+        <div className="location-wrapper">
+          <div className="location-image-box">
+            <img src={`${BASE_URL}${collegeImage}`} alt="Plant location" />
           </div>
 
-          <div className="col-md-6 d-flex align-items-center">
-            <div className="card-body">
-              <h5 className="fw-semibold mb-3">Campus Location</h5>
+          <div className="location-text-box">
+            <h5 className="fw-semibold mb-2">Campus Location</h5>
 
-              <p className="mb-0">{plant.location}</p>
-            </div>
+            <p className="mb-0">{plant.location}</p>
           </div>
         </div>
       </div>
     </div>
   );
 };
+
 export default LocationSection;

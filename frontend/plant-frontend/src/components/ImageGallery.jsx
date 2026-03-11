@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { BASE_URL } from "../config/server";
 
 const ImageGallery = ({ images }) => {
   const [selectedImage, setSelectedImage] = useState(null);
@@ -11,7 +12,7 @@ const ImageGallery = ({ images }) => {
         {images.map((img, index) => (
           <div className="col-4" key={index}>
             <img
-              src={`${import.meta.env.VITE_BASE_URL}${img}`}
+              src={`${BASE_URL}${img}`}
               className="img-fluid shadow-sm gallery-img"
               onClick={() => setSelectedImage(img)}
               style={{
@@ -39,7 +40,7 @@ const ImageGallery = ({ images }) => {
           onClick={() => setSelectedImage(null)}
         >
           <img
-            src={`${import.meta.env.VITE_BASE_URL}${selectedImage}`}
+            src={`${BASE_URL}${selectedImage}`}
             style={{
               maxWidth: "90%",
               maxHeight: "90%",
