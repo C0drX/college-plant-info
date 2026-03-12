@@ -6,7 +6,7 @@ const ImageGallery = ({ images }) => {
 
   return (
     <div className="mb-4">
-      <h3 className="mb-3 fw-bold text-success">📸 Plant Images</h3>
+      <h3 className="mb-3 fw-bold text-success">Plant Images</h3>
 
       <div className="row g-3">
         {images.map((img, index) => (

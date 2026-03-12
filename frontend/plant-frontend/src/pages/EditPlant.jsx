@@ -6,6 +6,7 @@ import { BASE_URL } from "../config/server";
 import FormInput from "../components/FormInput";
 import FormTextarea from "../components/FormTextArea";
 import ImageUpload from "../components/ImageUpload";
+import CategoryDropdown from "../components/CategoryDropdown";
 
 function EditPlant() {
   const { id } = useParams();
@@ -21,6 +22,9 @@ function EditPlant() {
     uses: "",
     origin: "",
     location: "",
+    category: "",
+    fruit_info: "",
+    medicinal_importance: "",
   });
 
   const [images, setImages] = useState({
@@ -44,15 +48,18 @@ function EditPlant() {
       const res = await getPlantById(id);
       const plant = res.data;
 
-      setForm({
-        common_name: plant.common_name || "",
-        scientific_name: plant.scientific_name || "",
-        family: plant.family || "",
-        description: plant.description || "",
-        uses: plant.uses || "",
-        location: plant.location || "",
-        origin: plant.origin || "",
-      });
+      //     setForm({
+      //         common_name: plant.common_name || "",
+      // scientific_name: plant.scientific_name || "",
+      // family: plant.family || "",
+      // description: plant.description || "",
+      // uses: plant.uses || "",
+      // location: plant.location || "",
+      // origin: plant.origin || "",
+      // category: plant.category || "",
+      // fruit_info: plant.fruit_info || "",
+      // medicinal_importance: plant.medicinal_importance || "",
+      //     });
 
       const initialData = {
         common_name: plant.common_name || "",
@@ -62,6 +69,9 @@ function EditPlant() {
         uses: plant.uses || "",
         location: plant.location || "",
         origin: plant.origin || "",
+        category: plant.category || "",
+        fruit_info: plant.fruit_info || "",
+        medicinal_importance: plant.medicinal_importance || "",
       };
 
       setForm(initialData);
@@ -171,6 +181,27 @@ function EditPlant() {
                     />
                   </div>
                 </div>
+                <div className="row">
+                  <div className="col-md-6">
+                    <CategoryDropdown
+                      label="Category"
+                      name="category"
+                      value={form.category}
+                      onChange={handleChange}
+                      required={true}
+                    />
+                  </div>
+
+                  <div className="col-md-6">
+                    <FormInput
+                      label="Fruit Info"
+                      name="fruit_info"
+                      value={form.fruit_info}
+                      onChange={handleChange}
+                      placeholder="Mango / Guava / No edible fruit"
+                    />
+                  </div>
+                </div>
 
                 <FormInput
                   label="Family"
@@ -197,6 +228,12 @@ function EditPlant() {
                   label="Uses"
                   name="uses"
                   value={form.uses}
+                  onChange={handleChange}
+                />
+                <FormTextarea
+                  label="Medicinal Importance"
+                  name="medicinal_importance"
+                  value={form.medicinal_importance}
                   onChange={handleChange}
                 />
               </div>

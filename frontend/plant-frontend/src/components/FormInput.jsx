@@ -1,6 +1,13 @@
 import React from "react";
 
-const FormInput = ({ label, name, value, onChange, required = false }) => {
+const FormInput = ({
+  label,
+  name,
+  value,
+  onChange,
+  required = false,
+  placeHolder,
+}) => {
   return (
     <div className="mb-3">
       <label className="form-label fw-semibold">{label}</label>
@@ -12,6 +19,7 @@ const FormInput = ({ label, name, value, onChange, required = false }) => {
         value={value}
         onChange={onChange}
         required={required}
+        placeholder={placeHolder}
       />
     </div>
   );

@@ -13,6 +13,9 @@ exports.getAllPlants = (req, res) => {
       p.origin,
       p.family,
       p.location,
+      p.category,
+      p.fruit_info,
+      p.medicinal_importance,
       MIN(pi.image_path) AS cover_image
     FROM plants p
     LEFT JOIN plant_images pi 
@@ -73,17 +76,31 @@ exports.addPlant = (req, res) => {
     uses,
     location,
     origin,
+    category,
+    fruit_info,
+    medicinal_importance,
   } = req.body;
 
   const sql = `
   INSERT INTO plants
-  (common_name, scientific_name, family, description, uses, location, origin)
-  VALUES (?, ?, ?, ?, ?, ?, ?)
+  (common_name, scientific_name, family, description, uses, location, origin, category, fruit_info, medicinal_importance)
+  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `;
 
   db.query(
     sql,
-    [common_name, scientific_name, family, description, uses, location, origin],
+    [
+      common_name,
+      scientific_name,
+      family,
+      description,
+      uses,
+      location,
+      origin,
+      category,
+      fruit_info,
+      medicinal_importance,
+    ],
     async (err, result) => {
       if (err) {
         return res.status(500).json(err);
@@ -159,6 +176,9 @@ exports.updatePlant = (req, res) => {
     uses,
     location,
     origin,
+    category,
+    fruit_info,
+    medicinal_importance,
   } = req.body;
 
   const getPlantQuery = "SELECT * FROM plants WHERE id = ?";
@@ -180,11 +200,14 @@ exports.updatePlant = (req, res) => {
       uses: uses ?? plant.uses,
       location: location ?? plant.location,
       origin: origin ?? plant.origin,
+      category: category ?? plant.category,
+      fruit_info: fruit_info ?? plant.fruit_info,
+      medicinal_importance: medicinal_importance ?? plant.medicinal_importance,
     };
 
     const updateQuery = `
       UPDATE plants
-      SET common_name=?, scientific_name=?, family=?, description=?, uses=?, location=?, origin=?
+      SET common_name=?, scientific_name=?, family=?, description=?, uses=?, location=?, origin=?, category=?, fruit_info=?, medicinal_importance=?
       WHERE id=?
     `;
 
@@ -198,6 +221,9 @@ exports.updatePlant = (req, res) => {
         updatedData.uses,
         updatedData.location,
         updatedData.origin,
+        updatedData.category,
+        updatedData.fruit_info,
+        updatedData.medicinal_importance,
         id,
       ],
       (err) => {

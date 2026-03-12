@@ -5,7 +5,7 @@ const LocationSection = ({ plant }) => {
 
   return (
     <div className="mb-5">
-      <h3 className="mb-4 fw-bold text-success">📍 Location in College</h3>
+      <h3 className="mb-4 fw-bold text-success">Plant in College</h3>
 
       <div className="card shadow-sm border-0 location-card">
         <div className="location-wrapper">
@@ -14,7 +14,7 @@ const LocationSection = ({ plant }) => {
           </div>
 
           <div className="location-text-box">
-            <h5 className="fw-semibold mb-2">Campus Location</h5>
+            <h5 className="fw-semibold mb-2">Location at Campus</h5>
 
             <p className="mb-0">{plant.location}</p>
           </div>

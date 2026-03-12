@@ -11,6 +11,10 @@ const ScientificDetails = ({ plant }) => {
       value: plant.family,
     },
     {
+      label: "Category",
+      value: plant.category,
+    },
+    {
       label: "Origin",
       value: plant.origin,
     },
@@ -22,12 +26,12 @@ const ScientificDetails = ({ plant }) => {
 
       <div className="row g-3">
         {details.map((item, index) => (
-          <div className="col-md-4" key={index}>
+          <div className="col-md-6" key={index}>
             <div className="card shadow-sm border-0 h-100">
               <div className="card-body text-center">
                 <h6 className="text-muted mb-2">{item.label}</h6>
 
-                <h5 className="fw-semibold">{item.value}</h5>
+                <h5 className="fw-semibold">{item.value ?? "Not available"}</h5>
               </div>
             </div>
           </div>

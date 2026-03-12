@@ -18,10 +18,10 @@ app.use("/qrcodes", express.static("qrcodes"));
 app.use("/api/plants", plantRoutes);
 
 //!! For Serving Frontend
-app.use("/plants", express.static("../frontend/dist"));
-app.get("/plants/*", (req, res) => {
-  res.sendFile(path.resolve("../frontend/dist/index.html"));
-});
+// app.use("/plants", express.static("../frontend/dist"));
+// app.get("/plants/*", (req, res) => {
+//   res.sendFile(path.resolve("../frontend/dist/index.html"));
+// });
 
 //!----------------
 

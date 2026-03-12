@@ -5,6 +5,7 @@ import { addPlant } from "../services/api";
 import FormInput from "../components/FormInput";
 import FormTextarea from "../components/FormTextArea";
 import ImageUpload from "../components/ImageUpload";
+import CategoryDropdown from "../components/CategoryDropdown";
 
 function AddPlant() {
   const navigate = useNavigate();
@@ -17,6 +18,9 @@ function AddPlant() {
     uses: "",
     origin: "",
     location: "",
+    category: "",
+    fruit_info: "",
+    medicinal_importance: "",
   });
 
   const [images, setImages] = useState({
@@ -116,6 +120,37 @@ function AddPlant() {
                     />
                   </div>
                 </div>
+                <div className="row">
+                  {/* <div className="col-md-6">
+                    <FormInput
+                      label="Category"
+                      name="category"
+                      value={form.category}
+                      onChange={handleChange}
+                      placeholder="Decorative / Flowering / Fruit / Medicinal"
+                    />
+                  </div> */}
+
+                  <div className="col-md-6">
+                    <CategoryDropdown
+                      label="Category"
+                      name="category"
+                      value={form.category}
+                      onChange={handleChange}
+                      required
+                    />
+                  </div>
+
+                  <div className="col-md-6">
+                    <FormInput
+                      label="Fruit Info"
+                      name="fruit_info"
+                      value={form.fruit_info}
+                      onChange={handleChange}
+                      placeholder="Mango / Guava / No edible fruit"
+                    />
+                  </div>
+                </div>
 
                 <FormInput
                   label="Family"
@@ -146,6 +181,13 @@ function AddPlant() {
                   value={form.uses}
                   onChange={handleChange}
                   required
+                />
+
+                <FormTextarea
+                  label="Medicinal Importance"
+                  name="medicinal_importance"
+                  value={form.medicinal_importance}
+                  onChange={handleChange}
                 />
               </div>
             </div>
