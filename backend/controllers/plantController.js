@@ -299,3 +299,32 @@ exports.deletePlant = (req, res) => {
     });
   });
 };
+
+///!!! Regenerate QR Codes with latest data
+exports.regenerateAllQR = async (req, res) => {
+  const sql = "SELECT id FROM plants";
+
+  db.query(sql, async (err, plants) => {
+    if (err) {
+      return res.status(500).json(err);
+    }
+
+    try {
+      for (const plant of plants) {
+        const plantId = plant.id;
+
+        await generatePlantQR(plantId);
+      }
+
+      res.json({
+        message: "All QR codes regenerated successfully",
+        total: plants.length,
+      });
+    } catch (error) {
+      res.status(500).json({
+        error: "QR regeneration failed",
+        details: error,
+      });
+    }
+  });
+};

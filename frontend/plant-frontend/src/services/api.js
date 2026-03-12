@@ -26,3 +26,7 @@ export const addPlant = (data) =>
       "Content-Type": "multipart/form-data",
     },
   });
+
+export const regenerateQRCodes = () => {
+  return API.post("/plants/regenerate-qrs");
+};

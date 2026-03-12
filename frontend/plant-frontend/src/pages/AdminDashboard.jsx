@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import PlantList from "../components/PlantList";
 import QrModal from "../components/modals/QrModal";
 import DeleteModal from "../components/modals/DeleteModal";
+import { regenerateQRCodes } from "../services/api";
 
 function AdminDashboard() {
   const [plants, setPlants] = useState([]);
@@ -38,6 +39,25 @@ function AdminDashboard() {
     }
   };
 
+  const handleRegenerateQR = async () => {
+    const confirm = window.confirm(
+      "This will regenerate QR codes for all plants. Continue?",
+    );
+
+    if (!confirm) return;
+
+    try {
+      await regenerateQRCodes();
+
+      alert("QR codes regenerated successfully");
+
+      loadPlants();
+    } catch (err) {
+      console.error(err);
+      alert("Failed to regenerate QR codes");
+    }
+  };
+
   return (
     <div className="container py-4">
       <div className="card shadow-sm border-0">
@@ -59,6 +79,13 @@ function AdminDashboard() {
             <Link to="/admin/add" className="btn btn-success btn-sm">
               + Add Plant
             </Link>
+
+            <button
+              className="btn btn-primary btn-sm"
+              onClick={handleRegenerateQR}
+            >
+              Regenerate QR
+            </button>
           </div>
         </div>
         <div className="card-body">

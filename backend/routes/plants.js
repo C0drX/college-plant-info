@@ -27,6 +27,8 @@ router.put(
   plantController.updatePlant,
 );
 
+router.post("/regenerate-qrs", plantController.regenerateAllQR);
+
 router.delete("/:id", plantController.deletePlant);
 
 module.exports = router;
