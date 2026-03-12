@@ -10,7 +10,6 @@ import EditPlant from "./pages/EditPlant";
 function App() {
   return (
     <BrowserRouter>
-
       <Navbar />
 
       <Routes>
@@ -20,7 +19,6 @@ function App() {
         <Route path="/admin/add" element={<AddPlant />} />
         <Route path="/admin/edit/:id" element={<EditPlant />} />
       </Routes>
-
     </BrowserRouter>
   );
 }

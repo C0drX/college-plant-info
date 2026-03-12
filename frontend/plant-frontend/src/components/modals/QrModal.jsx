@@ -1,4 +1,4 @@
-import { BASE_URL } from "../config/server";
+import { BASE_URL } from "../../config/server";
 
 function QrModal({ plant, onClose }) {
   if (!plant) return null;

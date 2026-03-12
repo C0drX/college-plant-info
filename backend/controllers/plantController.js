@@ -10,6 +10,7 @@ exports.getAllPlants = (req, res) => {
       p.id,
       p.common_name,
       p.scientific_name,
+      p.origin,
       p.family,
       p.location,
       MIN(pi.image_path) AS cover_image
@@ -64,18 +65,25 @@ exports.getPlantById = (req, res) => {
 
 // Add plant
 exports.addPlant = (req, res) => {
-  const { common_name, scientific_name, family, description, uses, location } =
-    req.body;
+  const {
+    common_name,
+    scientific_name,
+    family,
+    description,
+    uses,
+    location,
+    origin,
+  } = req.body;
 
   const sql = `
   INSERT INTO plants
-  (common_name, scientific_name, family, description, uses, location)
-  VALUES (?, ?, ?, ?, ?, ?)
+  (common_name, scientific_name, family, description, uses, location, origin)
+  VALUES (?, ?, ?, ?, ?, ?, ?)
   `;
 
   db.query(
     sql,
-    [common_name, scientific_name, family, description, uses, location],
+    [common_name, scientific_name, family, description, uses, location, origin],
     async (err, result) => {
       if (err) {
         return res.status(500).json(err);
@@ -141,12 +149,17 @@ exports.addPlant = (req, res) => {
 
 // Update plant
 exports.updatePlant = (req, res) => {
-  const id = req.params.id;
+  const id = parseInt(req.params.id);
 
-  const { common_name, scientific_name, family, description, uses, location } =
-    req.body;
-
-  const newImage = req.file ? req.file.filename : null;
+  const {
+    common_name,
+    scientific_name,
+    family,
+    description,
+    uses,
+    location,
+    origin,
+  } = req.body;
 
   const getPlantQuery = "SELECT * FROM plants WHERE id = ?";
 
@@ -159,30 +172,19 @@ exports.updatePlant = (req, res) => {
 
     const plant = result[0];
 
-    // agar new image aayi hai to old image delete karo
-    if (newImage && plant.image) {
-      const oldImagePath = path.join(__dirname, "..", "images", plant.image);
-
-      fs.unlink(oldImagePath, (err) => {
-        if (err) {
-          console.log("Old image delete error:", err.message);
-        }
-      });
-    }
-
     const updatedData = {
-      common_name: common_name || plant.common_name,
-      scientific_name: scientific_name || plant.scientific_name,
-      family: family || plant.family,
-      description: description || plant.description,
-      uses: uses || plant.uses,
-      location: location || plant.location,
-      image: newImage || plant.image,
+      common_name: common_name ?? plant.common_name,
+      scientific_name: scientific_name ?? plant.scientific_name,
+      family: family ?? plant.family,
+      description: description ?? plant.description,
+      uses: uses ?? plant.uses,
+      location: location ?? plant.location,
+      origin: origin ?? plant.origin,
     };
 
     const updateQuery = `
       UPDATE plants
-      SET common_name=?, scientific_name=?, family=?, description=?, uses=?, location=?, image=?
+      SET common_name=?, scientific_name=?, family=?, description=?, uses=?, location=?, origin=?
       WHERE id=?
     `;
 
@@ -195,11 +197,47 @@ exports.updatePlant = (req, res) => {
         updatedData.description,
         updatedData.uses,
         updatedData.location,
-        updatedData.image,
+        updatedData.origin,
         id,
       ],
       (err) => {
         if (err) return res.status(500).json(err);
+
+        // IMAGE UPDATE SECTION
+
+        const processImage = (file, type) => {
+          const ext = path.extname(file.originalname);
+          const newName = `plant-${id}-${type}${ext}`;
+
+          const oldPath = path.join(__dirname, "..", "images", file.filename);
+          const newPath = path.join(__dirname, "..", "images", newName);
+
+          fs.renameSync(oldPath, newPath);
+
+          const imageQuery = `
+            UPDATE plant_images
+            SET image_path=?
+            WHERE plant_id=? AND image_type=?
+          `;
+
+          db.query(imageQuery, [newName, id, type], (err) => {
+            if (err) {
+              console.log("Image update error:", err);
+            }
+          });
+        };
+
+        if (req.files?.cover) {
+          processImage(req.files.cover[0], "cover");
+        }
+
+        if (req.files?.college) {
+          processImage(req.files.college[0], "college");
+        }
+
+        if (req.files?.reference) {
+          processImage(req.files.reference[0], "reference");
+        }
 
         res.json({
           message: "Plant updated successfully",
