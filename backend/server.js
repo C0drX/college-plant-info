@@ -17,6 +17,14 @@ app.use("/qrcodes", express.static("qrcodes"));
 //* for defining routes
 app.use("/api/plants", plantRoutes);
 
+//!! For Serving Frontend
+app.use("/plants", express.static("../frontend/dist"));
+app.get("/plants/*", (req, res) => {
+  res.sendFile(path.resolve("../frontend/dist/index.html"));
+});
+
+//!----------------
+
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
