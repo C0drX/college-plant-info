@@ -5,6 +5,7 @@ const cors = require("cors");
 
 const { connectWithRetry } = require("./config/db");
 const plantRoutes = require("./routes/plants");
+const adminRoutes = require("./routes/adminRoutes");
 
 const app = express();
 
@@ -15,6 +16,7 @@ app.use("/images", express.static("images"));
 app.use("/qrcodes", express.static("qrcodes"));
 
 app.use("/api/plants", plantRoutes);
+app.use("/api/admin", adminRoutes);
 
 const PORT = process.env.PORT || 5000;
 

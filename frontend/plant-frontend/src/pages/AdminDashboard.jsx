@@ -58,6 +58,11 @@ function AdminDashboard() {
     }
   };
 
+  const logout = () => {
+    localStorage.removeItem("admin_token");
+    window.location.href = "/admin/login";
+  };
+
   return (
     <div className="container py-4">
       <div className="card shadow-sm border-0">
@@ -85,6 +90,9 @@ function AdminDashboard() {
               onClick={handleRegenerateQR}
             >
               Regenerate QR
+            </button>
+            <button className="btn btn-outline-danger btn-sm" onClick={logout}>
+              Logout
             </button>
           </div>
         </div>

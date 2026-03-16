@@ -13,7 +13,7 @@ function Navbar() {
             Home
           </Link>
 
-          <Link className="btn btn-outline-light" to="/admin">
+          <Link className="btn btn-outline-light" to="/admin/dashboard">
             Admin
           </Link>
         </div>

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { getPlants } from "../services/api";
-import PlantCard from "../components/PlantCard";
+import PlantCardHome from "../components/PlantCardHome";
 
 function Home() {
   const [plants, setPlants] = useState([]);
@@ -45,7 +45,7 @@ function Home() {
 
       <div className="row">
         {filteredPlants.map((plant) => (
-          <PlantCard key={plant.id} plant={plant} />
+          <PlantCardHome key={plant.id} plant={plant} />
         ))}
       </div>
     </div>

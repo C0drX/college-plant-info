@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { BASE_URL } from "../config/server";
 
-function PlantCard({ plant }) {
+function PlantCardHome({ plant }) {
   return (
     <div className="col-6 col-md-4 mb-4">
       <div className="card plant-card h-100 shadow-sm">
@@ -31,4 +31,4 @@ function PlantCard({ plant }) {
   );
 }
 
-export default PlantCard;
+export default PlantCardHome;
