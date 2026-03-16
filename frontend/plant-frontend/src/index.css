@@ -332,3 +332,16 @@ html {
 .form-label {
   color: #495057;
 }
+
+/* Home Screen cards */
+
+.plant-card {
+  transition: all 0.25s ease;
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.plant-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
+}

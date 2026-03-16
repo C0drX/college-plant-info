@@ -5,7 +5,7 @@ function Navbar() {
     <nav className="navbar navbar-expand-lg navbar-dark bg-success">
       <div className="container-fluid px-4">
         <Link className="navbar-brand" to="/">
-          🌿 College Plant Info
+          College Plant Info
         </Link>
 
         <div>
