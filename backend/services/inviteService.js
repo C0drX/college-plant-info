@@ -32,7 +32,7 @@ async function createInvite(adminId) {
      */
     const query = `
             INSERT INTO admin_invites
-            (invite_key, created_by_admin_id, expires_at)
+            (invite_key, created_by, expires_at)
             VALUES (?, ?, ?)
         `;
 
@@ -106,7 +106,7 @@ async function markInviteUsed(inviteId, newAdminId) {
     const query = `
             UPDATE admin_invites
             SET used = TRUE,
-                used_by_admin_id = ?
+                used_by = ?
             WHERE id = ?
         `;
 

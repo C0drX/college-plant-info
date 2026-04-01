@@ -37,6 +37,8 @@ export const updatePlant = (id, data) =>
 
 export const deletePlant = (id) => API.delete(`/plants/${id}`);
 
+export const restorePlant = (id) => API.put(`/plants/${id}/restore`);
+
 export const regenerateQRCodes = () => API.post("/plants/regenerate-qrs");
 
 // Admin
@@ -46,3 +48,5 @@ export const getAdmins = () => API.get("/admin/get-admins");
 export const adminLogin = (data) => API.post("/admin/login", data);
 
 export const adminRegister = (data) => API.post("/admin/register", data);
+
+export const generateAdminInvite = (data) => API.post("/admin/generate-invite");

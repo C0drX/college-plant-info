@@ -1,16 +1,16 @@
-const { getPool } = require("../config/db");
-const fs = require("fs").promises;
+// const db = require("../config/db");
+const fs = require("fs");
 const path = require("path");
 const generatePlantQR = require("../services/qrService");
+const { getPool } = require("../config/db");
 
 const cache = {};
 
 // Get all plants
 exports.getAllPlants = async (req, res) => {
-  try {
-    const pool = getPool();
+  const pool = getPool();
 
-    const sql = `
+  const sql = `
       SELECT 
         p.id,
         p.common_name,
@@ -20,6 +20,7 @@ exports.getAllPlants = async (req, res) => {
         p.location,
         p.category,
         p.fruit_info,
+        p.is_active,
         p.medicinal_importance,
         MIN(pi.image_path) AS cover_image
       FROM plants p
@@ -29,17 +30,15 @@ exports.getAllPlants = async (req, res) => {
       ORDER BY p.id DESC
     `;
 
-    const [results] = await pool.query(sql);
+  const [results] = await pool.query(sql);
 
-    const plants = results.map((p) => ({
-      ...p,
-      cover_image: p.cover_image ? `/images/${p.cover_image}` : null,
-    }));
+  // cover_image ko full path bana dete hain
+  const plants = results.map((p) => ({
+    ...p,
+    cover_image: p.cover_image ? `/images/${p.cover_image}` : null,
+  }));
 
-    res.json(plants);
-  } catch (err) {
-    res.status(500).json(err);
-  }
+  res.json(plants);
 };
 
 // Get plant by ID
@@ -64,6 +63,10 @@ exports.getPlantById = async (req, res) => {
 
     const plant = plantResult[0];
 
+    if (plant.is_active === 0) {
+      return res.status(404).json({ message: "Plant not found" });
+    }
+
     const [images] = await pool.query(
       "SELECT image_path FROM plant_images WHERE plant_id = ?",
       [id],
@@ -82,9 +85,8 @@ exports.getPlantById = async (req, res) => {
 
 // Add plant
 exports.addPlant = async (req, res) => {
+  pool = getPool();
   try {
-    const pool = getPool();
-
     const {
       common_name,
       scientific_name,
@@ -100,8 +102,8 @@ exports.addPlant = async (req, res) => {
 
     const sql = `
       INSERT INTO plants
-      (common_name, scientific_name, family, description, uses, location, origin, category, fruit_info, medicinal_importance)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      (common_name, scientific_name, family, description, uses, location, origin, category, fruit_info, medicinal_importance, is_active)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, TRUE)
     `;
 
     const [result] = await pool.query(sql, [
@@ -121,43 +123,52 @@ exports.addPlant = async (req, res) => {
 
     const imageValues = [];
 
-    const processImage = async (file, type) => {
+    const processImage = (file, type) => {
       const ext = path.extname(file.originalname);
       const newName = `plant-${plantId}-${type}${ext}`;
 
       const oldPath = path.join(__dirname, "..", "images", file.filename);
       const newPath = path.join(__dirname, "..", "images", newName);
 
-      await fs.rename(oldPath, newPath);
+      fs.renameSync(oldPath, newPath);
 
       imageValues.push([plantId, newName, type]);
     };
 
-    if (req.files?.cover) await processImage(req.files.cover[0], "cover");
-    if (req.files?.college) await processImage(req.files.college[0], "college");
-    if (req.files?.reference)
-      await processImage(req.files.reference[0], "reference");
-
-    if (imageValues.length > 0) {
-      await pool.query(
-        `INSERT INTO plant_images (plant_id, image_path, image_type) VALUES ?`,
-        [imageValues],
-      );
+    if (req.files?.cover) {
+      processImage(req.files.cover[0], "cover");
     }
 
-    await generatePlantQR(plantId);
+    if (req.files?.college) {
+      processImage(req.files.college[0], "college");
+    }
+
+    if (req.files?.reference) {
+      processImage(req.files.reference[0], "reference");
+    }
+
+    if (imageValues.length > 0) {
+      const imageQuery = `
+        INSERT INTO plant_images (plant_id, image_path, image_type)
+        VALUES ?
+      `;
+
+      await pool.query(imageQuery, [imageValues], (err) => {
+        if (err) console.log("Image insert error:", err);
+      });
+    }
+
+    const qrFile = await generatePlantQR(plantId);
 
     res.json({
       message: "Plant added successfully",
-      plantId,
+      plantId: plantId,
       qr: `/qrcodes/plant-${plantId}.png`,
     });
-    delete cache[id];
   } catch (err) {
     res.status(500).json(err);
   }
 };
-
 // Update plant
 exports.updatePlant = async (req, res) => {
   try {
@@ -237,48 +248,120 @@ exports.updatePlant = async (req, res) => {
   }
 };
 
-// Delete plant
+// Delete plant //! Hard DELETE
+// exports.deletePlant = async (req, res) => {
+//   try {
+//     const pool = getPool();
+//     const plantId = req.params.id;
+
+//     const [images] = await pool.query(
+//       "SELECT image_path FROM plant_images WHERE plant_id = ?",
+//       [plantId],
+//     );
+
+//     for (const img of images) {
+//       const imagePath = path.join(__dirname, "..", "images", img.image_path);
+
+//       try {
+//         await fs.unlink(imagePath);
+//       } catch (err) {
+//         console.log("Image delete error:", err.message);
+//       }
+//     }
+
+//     const qrPath = path.join(
+//       __dirname,
+//       "..",
+//       "qrcodes",
+//       `plant-${plantId}.png`,
+//     );
+
+//     try {
+//       await fs.unlink(qrPath);
+//     } catch (err) {
+//       console.log("QR delete error:", err.message);
+//     }
+
+//     await pool.query("DELETE FROM plants WHERE id = ?", [plantId]);
+
+//     res.json({
+//       message: "Plant and all related files deleted successfully",
+//     });
+//     delete cache[id];
+//   } catch (err) {
+//     res.status(500).json(err);
+//   }
+// };
+
+//Delete plant //! Soft DELETE
 exports.deletePlant = async (req, res) => {
   try {
     const pool = getPool();
     const plantId = req.params.id;
 
-    const [images] = await pool.query(
-      "SELECT image_path FROM plant_images WHERE plant_id = ?",
+    // Check if plant exists
+    const [plant] = await pool.query(
+      "SELECT id, is_active FROM plants WHERE id = ?",
       [plantId],
     );
 
-    for (const img of images) {
-      const imagePath = path.join(__dirname, "..", "images", img.image_path);
-
-      try {
-        await fs.unlink(imagePath);
-      } catch (err) {
-        console.log("Image delete error:", err.message);
-      }
+    if (plant.length === 0) {
+      return res.status(404).json({ message: "Plant not found" });
     }
 
-    const qrPath = path.join(
-      __dirname,
-      "..",
-      "qrcodes",
-      `plant-${plantId}.png`,
-    );
-
-    try {
-      await fs.unlink(qrPath);
-    } catch (err) {
-      console.log("QR delete error:", err.message);
+    // Already inactive check (optional but good practice)
+    if (!plant[0].is_active) {
+      return res.status(400).json({ message: "Plant already deleted" });
     }
 
-    await pool.query("DELETE FROM plants WHERE id = ?", [plantId]);
+    // Soft delete (mark inactive)
+    await pool.query("UPDATE plants SET is_active = false WHERE id = ?", [
+      plantId,
+    ]);
+
+    // Optional: clear cache
+    delete cache[plantId];
 
     res.json({
-      message: "Plant and all related files deleted successfully",
+      message: "Plant deleted (soft delete) successfully",
     });
-    delete cache[id];
   } catch (err) {
     res.status(500).json(err);
+  }
+};
+
+//restore plant
+exports.restorePlant = async (req, res) => {
+  try {
+    const pool = getPool();
+    const plantId = req.params.id;
+    const [plant] = await pool.query(
+      "SELECT id, is_active FROM plants WHERE id = ?",
+      [plantId],
+    );
+
+    if (plant.length === 0) {
+      return res.status(404).json({ message: "Plant not found" });
+    }
+
+    // Already inactive check (optional but good practice)
+    if (plant[0].is_active) {
+      return res.status(400).json({ message: "Plant already active" });
+    }
+
+    // Soft delete (mark inactive)
+    await pool.query("UPDATE plants SET is_active = true WHERE id = ?", [
+      plantId,
+    ]);
+
+    // Optional: clear cache
+    delete cache[plantId];
+
+    res.json({
+      message: "Plant restored successfully",
+    });
+  } catch (err) {
+    res.status(500).json(err.message);
   }
 };
 

@@ -15,9 +15,9 @@ const UsesSection = ({ uses, plantId }) => {
     <div className="card border-0 shadow-sm mb-4">
       <div className="card-body">
         <h4 className="mb-3 text-success fw-bold">Uses</h4>
-        <p className={`mb-2 clamp-text ${expanded ? "expanded" : ""}`}>
+        <div className={`mb-2 clamp-text ${expanded ? "expanded" : ""}`}>
           {formatText(uses)}
-        </p>
+        </div>
 
         {showToggle && (
           <span

@@ -4,7 +4,7 @@ import EditButton from "./buttons/EditButton";
 import DeleteButton from "./buttons/DeleteButton";
 import { BASE_URL } from "../config/server";
 
-function PlantListCard({ plant, onDelete, onShowQr }) {
+function PlantListCard({ plant, onDelete, onShowQr, isDeleted }) {
   const image = `${BASE_URL}${plant.cover_image}`;
 
   return (
@@ -34,7 +34,10 @@ function PlantListCard({ plant, onDelete, onShowQr }) {
 
         <EditButton id={plant.id} />
 
-        <DeleteButton onClick={() => onDelete(plant.id)} />
+        <DeleteButton
+          onClick={() => onDelete(plant.id)}
+          isDeleted={isDeleted}
+        />
       </div>
     </div>
   );

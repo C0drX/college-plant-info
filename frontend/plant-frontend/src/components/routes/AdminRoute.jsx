@@ -10,4 +10,14 @@ function AdminRoute({ children }) {
   return children;
 }
 
-export default AdminRoute;
+function LoggedInAdminRoute({ children }) {
+  const token = localStorage.getItem("admin_token");
+
+  if (token) {
+    return <Navigate to="/admin/dashboard" replace />;
+  }
+
+  return children;
+}
+
+export { AdminRoute, LoggedInAdminRoute };

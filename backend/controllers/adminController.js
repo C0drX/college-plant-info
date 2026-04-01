@@ -28,7 +28,7 @@ async function getAdmins(req, res) {
         a.id,
         a.name,
         a.email,
-        a.invited_by_admin_id,
+        a.invited_by,
         a.last_login,
         a.created_at,
         a.is_active 
@@ -230,7 +230,7 @@ async function registerAdmin(req, res) {
      */
     const query = `
             INSERT INTO admins
-            (id, name, email, password_hash, recovery_key_hash, invited_by_admin_id)
+            (id, name, email, password_hash, recovery_key_hash, invited_by)
             VALUES (?, ?, ?, ?, ?, ?)
         `;
 
@@ -240,7 +240,7 @@ async function registerAdmin(req, res) {
       email,
       passwordHash,
       recoveryKeyHash,
-      invite.created_by_admin_id,
+      invite.created_by,
     ]);
 
     /**

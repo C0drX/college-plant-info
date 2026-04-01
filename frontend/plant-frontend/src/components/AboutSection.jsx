@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { formatText } from "../utils/formatText";
+
 const AboutSection = ({ description, plantId }) => {
   const [expanded, setExpanded] = useState(false);
 
@@ -14,9 +15,9 @@ const AboutSection = ({ description, plantId }) => {
     <div className="card shadow-sm border-0">
       <div className="card-body">
         <h4 className="mb-3 text-success fw-bold">🌿 About the Plant</h4>
-        <p className={`mb-2 clamp-text ${expanded ? "expanded" : ""}`}>
+        <div className={`mb-2 clamp-text ${expanded ? "expanded" : ""}`}>
           {formatText(description)}
-        </p>
+        </div>
 
         {showToggle && (
           <span

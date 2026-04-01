@@ -1,7 +1,7 @@
-function DeleteButton({ onClick }) {
+function DeleteButton({ onClick, isDeleted }) {
   return (
     <button className="action-btn action-btn-danger" onClick={onClick}>
-      DELETE
+      {isDeleted ? "RESTORE" : "DELETE"}
     </button>
   );
 }

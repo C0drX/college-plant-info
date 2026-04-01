@@ -7,9 +7,10 @@ import AdminDashboard from "./pages/AdminDashboard";
 import AddPlant from "./pages/AddPlant";
 import EditPlant from "./pages/EditPlant";
 import AdminLogin from "./pages/AdminLogin";
-import AdminRoute from "./components/routes/AdminRoute";
+import { AdminRoute, LoggedInAdminRoute } from "./components/routes/AdminRoute";
 import AdminRegister from "./pages/AdminRegister";
 import ManageAdmins from "./pages/ManageAdmins";
+import PlantNotAVailable from "./pages/PlantNotAvailable";
 
 function App() {
   return (
@@ -19,13 +20,31 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/plant/:id" element={<PlantDetails />} />
-        {/* <Route path="/admin/dashboard" element={<AdminDashboard />} /> */}
+        <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/admin/add" element={<AddPlant />} />
         <Route path="/admin/edit/:id" element={<EditPlant />} />
 
-        <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/admin/register" element={<AdminRegister />} />
-        <Route path="/admin/manage-admins" element={<ManageAdmins />} />
+
+        <Route path="/plant-not-available" element={<PlantNotAVailable />} />
+
+        <Route
+          path="/admin/login"
+          element={
+            <LoggedInAdminRoute>
+              <AdminLogin />
+            </LoggedInAdminRoute>
+          }
+        />
+
+        <Route
+          path="/admin/manage-admins"
+          element={
+            <AdminRoute>
+              <ManageAdmins />
+            </AdminRoute>
+          }
+        />
 
         <Route
           path="/admin/dashboard"

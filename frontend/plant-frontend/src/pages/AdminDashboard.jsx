@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import { getPlants, deletePlant } from "../services/api";
+import { getPlants, deletePlant, restorePlant } from "../services/api";
 import { Link } from "react-router-dom";
 import PlantList from "../components/PlantList";
 import QrModal from "../components/modals/QrModal";
-import DeleteModal from "../components/modals/DeleteModal";
+import { DeleteModal, RestoreModal } from "../components/modals/CustomModal";
 import { regenerateQRCodes } from "../services/api";
 
 function AdminDashboard() {
@@ -11,10 +11,13 @@ function AdminDashboard() {
   const [qrPlant, setQrPlant] = useState(null);
   const [search, setSearch] = useState("");
   const [deletePlantId, setDeletePlantId] = useState(null);
+  const [restorePlantId, setRestorePlantId] = useState(null);
 
   const filteredPlants = plants.filter((plant) =>
     plant.common_name.toLowerCase().includes(search.toLowerCase()),
   );
+
+  const admin = JSON.parse(localStorage.getItem("admin"));
 
   useEffect(() => {
     loadPlants();
@@ -23,6 +26,20 @@ function AdminDashboard() {
   const loadPlants = async () => {
     const res = await getPlants();
     setPlants(res.data);
+  };
+
+  const confirmRestore = async () => {
+    if (!restorePlantId) return;
+
+    try {
+      await restorePlant(restorePlantId);
+
+      setRestorePlantId(null);
+
+      loadPlants();
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   const confirmDelete = async () => {
@@ -60,12 +77,14 @@ function AdminDashboard() {
 
   const logout = () => {
     localStorage.removeItem("admin_token");
+    localStorage.removeItem("admin");
     window.location.href = "/admin/login";
   };
 
   return (
     <div className="container py-4">
       <div className="card shadow-sm border-0">
+        <h1>Welcome {admin.name}</h1>
         <div className="card-header bg-white d-flex justify-content-between align-items-center">
           <h6 className="mb-0">
             Total Plants : <b>{plants.length}</b>
@@ -101,6 +120,16 @@ function AdminDashboard() {
             plants={filteredPlants}
             onDelete={setDeletePlantId}
             onShowQr={setQrPlant}
+            showDeleted={false}
+          />
+        </div>
+        <div className="card-body">
+          {/* <h3>Deleted Plants</h3> */}
+          <PlantList
+            plants={filteredPlants}
+            onDelete={setRestorePlantId}
+            onShowQr={setQrPlant}
+            showDeleted={true}
           />
         </div>
       </div>
@@ -109,6 +138,12 @@ function AdminDashboard() {
         onClose={() => setDeletePlantId(null)}
         onConfirm={confirmDelete}
       />
+      <RestoreModal
+        show={restorePlantId}
+        onClose={() => setRestorePlantId(null)}
+        onConfirm={confirmRestore}
+      />
+
       <QrModal plant={qrPlant} onClose={() => setQrPlant(null)} />
     </div>
   );

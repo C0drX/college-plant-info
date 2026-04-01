@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getPlantById, updatePlant } from "../services/api";
 import { BASE_URL } from "../config/server";
+import { CustomModal } from "../components/modals/CustomModal";
 
 import FormInput from "../components/FormInput";
 import FormTextarea from "../components/FormTextArea";
@@ -13,6 +14,7 @@ function EditPlant() {
   const navigate = useNavigate();
 
   const [originalForm, setOriginalForm] = useState(null);
+  const [showDeletedModal, setShowDeletedModal] = useState(false);
 
   const [form, setForm] = useState({
     common_name: "",
@@ -48,18 +50,18 @@ function EditPlant() {
       const res = await getPlantById(id);
       const plant = res.data;
 
-      //     setForm({
-      //         common_name: plant.common_name || "",
-      // scientific_name: plant.scientific_name || "",
-      // family: plant.family || "",
-      // description: plant.description || "",
-      // uses: plant.uses || "",
-      // location: plant.location || "",
-      // origin: plant.origin || "",
-      // category: plant.category || "",
-      // fruit_info: plant.fruit_info || "",
-      // medicinal_importance: plant.medicinal_importance || "",
-      //     });
+      // setForm({
+      //   common_name: plant.common_name || "",
+      //   scientific_name: plant.scientific_name || "",
+      //   family: plant.family || "",
+      //   description: plant.description || "",
+      //   uses: plant.uses || "",
+      //   location: plant.location || "",
+      //   origin: plant.origin || "",
+      //   category: plant.category || "",
+      //   fruit_info: plant.fruit_info || "",
+      //   medicinal_importance: plant.medicinal_importance || "",
+      // });
 
       const initialData = {
         common_name: plant.common_name || "",
@@ -87,7 +89,11 @@ function EditPlant() {
         college: college ? `${BASE_URL}${college}` : null,
       });
     } catch (err) {
-      console.error(err);
+      if (err.response && err.response.status === 404) {
+        setShowDeletedModal(true);
+      } else {
+        console.error(err);
+      }
     }
   };
 
@@ -307,6 +313,13 @@ function EditPlant() {
           </form>
         </div>
       </div>
+      {showDeletedModal && (
+        <CustomModal
+          title="Plant Not Found"
+          message="The plant you are trying to edit has been deleted. You may have to restore this plant first if you wish to edit it."
+          onConfirm={() => navigate("/admin/dashboard")}
+        />
+      )}
     </div>
   );
 }
