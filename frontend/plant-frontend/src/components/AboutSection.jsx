@@ -11,8 +11,17 @@ const AboutSection = ({ description, plantId }) => {
   }, [plantId]); // plant change hone par reset
 
   return (
+<<<<<<< Updated upstream
     <div className="mb-5">
       <h3 className="mb-3 fw-bold text-success">🌿 About the Plant</h3>
+=======
+    <div className="card shadow-sm border-0">
+      <div className="card-body">
+        <h4 className="mb-3 text-success fw-bold">🌿 About the Plant</h4>
+        <div className={`mb-2 clamp-text ${expanded ? "expanded" : ""}`}>
+          {formatText(description)}
+        </div>
+>>>>>>> Stashed changes
 
       <div className="card shadow-sm border-0">
         <div className="card-body">

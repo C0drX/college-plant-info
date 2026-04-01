@@ -11,8 +11,17 @@ const UsesSection = ({ uses, plantId }) => {
   }, [plantId]);
 
   return (
+<<<<<<< Updated upstream
     <div className="mb-5">
       <h3 className="mb-3 fw-bold text-success">💊 Uses</h3>
+=======
+    <div className="card border-0 shadow-sm mb-4">
+      <div className="card-body">
+        <h4 className="mb-3 text-success fw-bold">Uses</h4>
+        <div className={`mb-2 clamp-text ${expanded ? "expanded" : ""}`}>
+          {formatText(uses)}
+        </div>
+>>>>>>> Stashed changes
 
       <div className="card shadow-sm border-0">
         <div className="card-body">

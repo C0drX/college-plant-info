@@ -13,7 +13,8 @@ function Home() {
   const loadPlants = async () => {
     try {
       const res = await getPlants();
-      setPlants(res.data);
+      const activePlants = res.data.filter((plant) => plant.is_active);
+      setPlants(activePlants);
     } catch (err) {
       console.error(err);
     }

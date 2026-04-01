@@ -21,10 +21,34 @@ exports.getAllPlants = (req, res) => {
     ORDER BY p.id DESC
   `;
 
+<<<<<<< Updated upstream
   db.query(sql, (err, results) => {
     if (err) {
       return res.status(500).json(err);
     }
+=======
+    const sql = `
+      SELECT 
+        p.id,
+        p.common_name,
+        p.scientific_name,
+        p.origin,
+        p.family,
+        p.location,
+        p.category,
+        p.fruit_info,
+        p.is_active,
+        p.medicinal_importance,
+        MIN(pi.image_path) AS cover_image
+      FROM plants p
+      LEFT JOIN plant_images pi 
+        ON p.id = pi.plant_id
+      GROUP BY p.id
+      ORDER BY p.id DESC
+    `;
+
+    const [results] = await pool.query(sql);
+>>>>>>> Stashed changes
 
     // cover_image ko full path bana dete hain
     const plants = results.map((p) => ({
@@ -51,7 +75,18 @@ exports.getPlantById = (req, res) => {
 
     const plant = plantResult[0];
 
+<<<<<<< Updated upstream
     const imageQuery = "SELECT image_path FROM plant_images WHERE plant_id = ?";
+=======
+    if (plant.is_active == false) {
+      return res.status(404).json({ message: "Plant not found" });
+    }
+
+    const [images] = await pool.query(
+      "SELECT image_path FROM plant_images WHERE plant_id = ?",
+      [id],
+    );
+>>>>>>> Stashed changes
 
     db.query(imageQuery, [id], (err, images) => {
       if (err) return res.status(500).json(err);
@@ -75,6 +110,7 @@ exports.addPlant = (req, res) => {
     origin,
   } = req.body;
 
+<<<<<<< Updated upstream
   const sql = `
   INSERT INTO plants
   (common_name, scientific_name, family, description, uses, location, origin)
@@ -90,6 +126,41 @@ exports.addPlant = (req, res) => {
       }
 
       const plantId = result.insertId;
+=======
+    const {
+      common_name,
+      scientific_name,
+      family,
+      description,
+      uses,
+      location,
+      origin,
+      category,
+      fruit_info,
+      is_active,
+      medicinal_importance,
+    } = req.body;
+
+    const sql = `
+      INSERT INTO plants
+      (common_name, scientific_name, family, description, uses, location, origin, category, fruit_info, medicinal_importance, is_active)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, TRUE)
+    `;
+
+    const [result] = await pool.query(sql, [
+      common_name,
+      scientific_name,
+      family,
+      description,
+      uses,
+      location,
+      origin,
+      category,
+      fruit_info,
+      is_active,
+      medicinal_importance,
+    ]);
+>>>>>>> Stashed changes
 
       const imageValues = [];
 
@@ -173,6 +244,7 @@ exports.updatePlant = (req, res) => {
     const plant = result[0];
 
     const updatedData = {
+<<<<<<< Updated upstream
       common_name: common_name ?? plant.common_name,
       scientific_name: scientific_name ?? plant.scientific_name,
       family: family ?? plant.family,
@@ -190,6 +262,26 @@ exports.updatePlant = (req, res) => {
 
     db.query(
       updateQuery,
+=======
+      common_name: req.body.common_name ?? plant.common_name,
+      scientific_name: req.body.scientific_name ?? plant.scientific_name,
+      family: req.body.family ?? plant.family,
+      description: req.body.description ?? plant.description,
+      uses: req.body.uses ?? plant.uses,
+      location: req.body.location ?? plant.location,
+      origin: req.body.origin ?? plant.origin,
+      category: req.body.category ?? plant.category,
+      fruit_info: req.body.fruit_info ?? plant.fruit_info,
+      is_active: req.body.is_active ?? plant.is_active,
+      medicinal_importance:
+        req.body.medicinal_importance ?? plant.medicinal_importance,
+    };
+
+    await pool.query(
+      `UPDATE plants
+       SET common_name=?, scientific_name=?, family=?, description=?, uses=?, location=?, origin=?, category=?, fruit_info=?, medicinal_importance=?, is_active=?
+       WHERE id=?`,
+>>>>>>> Stashed changes
       [
         updatedData.common_name,
         updatedData.scientific_name,
@@ -198,6 +290,13 @@ exports.updatePlant = (req, res) => {
         updatedData.uses,
         updatedData.location,
         updatedData.origin,
+<<<<<<< Updated upstream
+=======
+        updatedData.category,
+        updatedData.fruit_info,
+        updatedData.medicinal_importance,
+        updatedData.is_active,
+>>>>>>> Stashed changes
         id,
       ],
       (err) => {
@@ -248,6 +347,7 @@ exports.updatePlant = (req, res) => {
   });
 };
 
+<<<<<<< Updated upstream
 // Delete plant
 exports.deletePlant = (req, res) => {
   const plantId = req.params.id;
@@ -298,4 +398,144 @@ exports.deletePlant = (req, res) => {
       });
     });
   });
+=======
+// Delete plant //! Hard DELETE
+// exports.deletePlant = async (req, res) => {
+//   try {
+//     const pool = getPool();
+//     const plantId = req.params.id;
+
+//     const [images] = await pool.query(
+//       "SELECT image_path FROM plant_images WHERE plant_id = ?",
+//       [plantId],
+//     );
+
+//     for (const img of images) {
+//       const imagePath = path.join(__dirname, "..", "images", img.image_path);
+
+//       try {
+//         await fs.unlink(imagePath);
+//       } catch (err) {
+//         console.log("Image delete error:", err.message);
+//       }
+//     }
+
+//     const qrPath = path.join(
+//       __dirname,
+//       "..",
+//       "qrcodes",
+//       `plant-${plantId}.png`,
+//     );
+
+//     try {
+//       await fs.unlink(qrPath);
+//     } catch (err) {
+//       console.log("QR delete error:", err.message);
+//     }
+
+//     await pool.query("DELETE FROM plants WHERE id = ?", [plantId]);
+
+//     res.json({
+//       message: "Plant and all related files deleted successfully",
+//     });
+//     delete cache[id];
+//   } catch (err) {
+//     res.status(500).json(err);
+//   }
+// };
+
+//Delete plant //! Soft DELETE
+exports.deletePlant = async (req, res) => {
+  try {
+    const pool = getPool();
+    const plantId = req.params.id;
+
+    // Check if plant exists
+    const [plant] = await pool.query(
+      "SELECT id, is_active FROM plants WHERE id = ?",
+      [plantId],
+    );
+
+    if (plant.length === 0) {
+      return res.status(404).json({ message: "Plant not found" });
+    }
+
+    // Already inactive check (optional but good practice)
+    if (!plant[0].is_active) {
+      return res.status(400).json({ message: "Plant already deleted" });
+    }
+
+    // Soft delete (mark inactive)
+    await pool.query("UPDATE plants SET is_active = false WHERE id = ?", [
+      plantId,
+    ]);
+
+    // Optional: clear cache
+    delete cache[plantId];
+
+    res.json({
+      message: "Plant deleted (soft delete) successfully",
+    });
+  } catch (err) {
+    res.status(500).json(err);
+  }
+};
+
+//restore plant
+exports.restorePlant = async (req, res) => {
+  try {
+    const pool = getPool();
+    const plantId = req.params.id;
+    const [plant] = await pool.query(
+      "SELECT id, is_active FROM plants WHERE id = ?",
+      [plantId],
+    );
+
+    if (plant.length === 0) {
+      return res.status(404).json({ message: "Plant not found" });
+    }
+
+    // Already inactive check (optional but good practice)
+    if (plant[0].is_active) {
+      return res.status(400).json({ message: "Plant already active" });
+    }
+
+    // Soft delete (mark inactive)
+    await pool.query("UPDATE plants SET is_active = true WHERE id = ?", [
+      plantId,
+    ]);
+
+    // Optional: clear cache
+    delete cache[plantId];
+
+    res.json({
+      message: "Plant restored successfully",
+    });
+  } catch (err) {
+    res.status(500).json(err.message);
+  }
+};
+
+// Regenerate all QR codes
+exports.regenerateAllQR = async (req, res) => {
+  try {
+    const pool = getPool();
+
+    const [plants] = await pool.query("SELECT id FROM plants");
+
+    for (const plant of plants) {
+      await generatePlantQR(plant.id);
+    }
+
+    res.json({
+      message: "All QR codes regenerated successfully",
+      total: plants.length,
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: "QR regeneration failed",
+      details: error,
+    });
+  }
+>>>>>>> Stashed changes
 };

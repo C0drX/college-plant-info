@@ -29,4 +29,6 @@ router.put(
 
 router.delete("/:id", plantController.deletePlant);
 
+router.put("/:id/restore", plantController.restorePlant);
+
 module.exports = router;
