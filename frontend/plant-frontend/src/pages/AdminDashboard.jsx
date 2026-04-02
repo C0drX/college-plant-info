@@ -3,7 +3,13 @@ import { getPlants, deletePlant, restorePlant } from "../services/api";
 import { Link } from "react-router-dom";
 import PlantList from "../components/PlantList";
 import QrModal from "../components/modals/QrModal";
-import { DeleteModal, RestoreModal } from "../components/modals/CustomModal";
+import {
+  DeleteModal,
+  RestoreModal,
+  LoaderModal,
+  MessageModal,
+  ConfirmModal,
+} from "../components/modals/CustomModal";
 import { regenerateQRCodes, getAdmins } from "../services/api";
 
 function AdminDashboard() {
@@ -13,6 +19,13 @@ function AdminDashboard() {
   const [deletePlantId, setDeletePlantId] = useState(null);
   const [restorePlantId, setRestorePlantId] = useState(null);
   const [admins, setAdmins] = useState(null);
+
+  // 🔥 NEW STATE (loader ke liye)
+  const [isRegenerating, setIsRegenerating] = useState(false);
+  const [showMessage, setShowMessage] = useState(false);
+  const [showErrorMessage, setShowErrorMessage] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+
   const admin = JSON.parse(localStorage.getItem("admin"));
 
   useEffect(() => {
@@ -59,20 +72,23 @@ function AdminDashboard() {
     }
   };
 
-  const handleRegenerateQR = async () => {
-    const confirm = window.confirm(
-      "This will regenerate QR codes for all plants. Continue?",
-    );
-    if (!confirm) return;
-
+  // 🔥 UPDATED FUNCTION (loader added)
+  const regenerateQR = async () => {
     try {
+      setIsRegenerating(true);
       await regenerateQRCodes();
-      alert("QR codes regenerated successfully");
       loadPlants();
+      setShowMessage(true);
     } catch (err) {
       console.error(err);
-      alert("Failed to regenerate QR codes");
+      setShowErrorMessage(true);
+    } finally {
+      setIsRegenerating(false);
     }
+  };
+
+  const showConfirmModal = () => {
+    setShowConfirm(true);
   };
 
   const logout = () => {
@@ -81,26 +97,49 @@ function AdminDashboard() {
     window.location.href = "/admin/login";
   };
 
-  // 📊 Stats
   const activePlants = plants.filter((p) => p.is_active).length;
   const deletedPlants = plants.filter((p) => !p.is_active).length;
   const totalAdmins = admins ? admins.length : "--";
 
-  // Filter plants based on search
   const filteredPlants = plants.filter((plant) =>
     plant.common_name.toLowerCase().includes(search.toLowerCase()),
   );
 
   return (
-    <div className="container py-4">
+    <div className="container py-4 position-relative">
+      {/* 🔥 LOADER OVERLAY (Bootstrap based) */}
+      <LoaderModal show={isRegenerating} text="Regenerating QR codes..." />
+      <MessageModal
+        show={showMessage}
+        type="success"
+        message="QR codes regenerated successfully!"
+        onClose={() => setShowMessage(false)}
+      />
+
+      <MessageModal
+        show={showErrorMessage}
+        type="failed"
+        message="Failed to regenerate QR codes."
+        onClose={() => setShowErrorMessage(false)}
+      />
+
+      <ConfirmModal
+        show={showConfirm}
+        title="Regenerate QR Codes"
+        message="This will regenerate QR codes for all plants. Are you sure?"
+        onConfirm={() => {
+          regenerateQR();
+          setShowConfirm(false);
+        }}
+        onClose={() => setShowConfirm(false)}
+      />
+
       <div
         className="card shadow-sm border-0 p-3"
         style={{ borderRadius: "16px", overflow: "hidden" }}
       >
-        {/* 🔥 Welcome */}
         <h2 className="mb-3">Welcome {admin.name}</h2>
 
-        {/* 📊 Stats Cards */}
         <div className="row g-3 mb-3">
           <div className="col-6 col-md-3">
             <div className="card text-white bg-primary shadow-sm">
@@ -139,13 +178,12 @@ function AdminDashboard() {
           </div>
         </div>
 
-        {/* ⚙️ Buttons Row */}
         <div className="d-flex flex-wrap gap-2 mb-3">
           <Link to="/admin/add" className="btn btn-success">
             + Add Plant
           </Link>
 
-          <button className="btn btn-primary" onClick={handleRegenerateQR}>
+          <button className="btn btn-primary" onClick={showConfirmModal}>
             Regenerate QR
           </button>
 
@@ -162,7 +200,6 @@ function AdminDashboard() {
           </button>
         </div>
 
-        {/* 🔍 Search */}
         <div className="mb-3">
           <input
             type="text"
@@ -173,7 +210,6 @@ function AdminDashboard() {
           />
         </div>
 
-        {/* 🌿 Active Plants */}
         <div className="card-body">
           <PlantList
             plants={filteredPlants}
@@ -183,7 +219,6 @@ function AdminDashboard() {
           />
         </div>
 
-        {/* 🗑 Deleted Plants */}
         <div className="card-body">
           <PlantList
             plants={filteredPlants}

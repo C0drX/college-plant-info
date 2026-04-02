@@ -1,22 +1,24 @@
-const QRCode = require("qrcode");
+const { exec } = require("child_process");
 const path = require("path");
 
-const generatePlantQR = async (plantId) => {
-  //   const plantURL = `http://192.168.1.4:5173/plant/${plantId}`;
-  const plantURL = `${process.env.FRONTEND_ADDRESS}/plant/${plantId}`;
+const generatePlantQR = (plantId) => {
+  return new Promise((resolve, reject) => {
+    const plantURL = `${process.env.FRONTEND_ADDRESS}/plant/${plantId}`;
+    const fileName = `plant-${plantId}.png`;
+    const qrPath = path.join(__dirname, "..", "qrcodes", fileName);
 
-  const qrPath = path.join(__dirname, "..", "qrcodes", `plant-${plantId}.png`);
+    const command = `python services/generate_qr.py "${plantURL}" "${qrPath}" "./assets/leaf.png"`;
+    exec(command, (error, stdout, stderr) => {
+      if (error) {
+        console.error("❌ Python error:", error);
+        return reject(error);
+      }
 
-  await QRCode.toFile(qrPath, plantURL, {
-    color: {
-      dark: "#1b5e20", // dark green
-      light: "#ffffff",
-    },
-    width: 500,
-    margin: 2,
+      if (stderr) console.log("⚠️ stderr:", stderr);
+
+      resolve(fileName);
+    });
   });
-
-  return `plant-${plantId}.png`;
 };
 
 module.exports = generatePlantQR;
