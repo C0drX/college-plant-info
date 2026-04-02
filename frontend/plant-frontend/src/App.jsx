@@ -13,6 +13,7 @@ import ManageAdmins from "./pages/ManageAdmins";
 import PlantNotAVailable from "./pages/PlantNotAvailable";
 import AdminProfile from "./pages/AdminProfile";
 import ForgotPassword from "./pages/ForgotPassword";
+import NotFound from "./pages/NotFound";
 
 function App() {
   return (
@@ -20,9 +21,14 @@ function App() {
       <Navbar />
 
       <Routes>
+        {/* 👇 YE MOST IMPORTANT LINE 
+           Redirect to NotFound page if route doesn't match any of the defined routes.
+        */}
+        <Route path="*" element={<NotFound />} />
+
         <Route path="/" element={<Home />} />
         <Route path="/plant/:id" element={<PlantDetails />} />
-        <Route path="/admin" element={<AdminDashboard />} />
+        {/* <Route path="/admin" element={<AdminDashboard />} /> */}
         <Route path="/admin/add" element={<AddPlant />} />
         <Route path="/admin/edit/:id" element={<EditPlant />} />
 

@@ -33,4 +33,12 @@ router.delete("/:id", plantController.deletePlant);
 
 router.put("/:id/restore", plantController.restorePlant);
 
+router.get("/dev/crash", (req, res) => {
+  console.log("💥 Crash route triggered");
+  // thoda response bhej de (optional)
+  res.send("Server will crash now...");
+  // force crash
+  process.exit(1);
+});
+
 module.exports = router;

@@ -149,7 +149,7 @@ function EditPlant() {
 
       alert("Plant updated successfully 🌿");
 
-      navigate("/admin");
+      navigate("/admin/dashboard");
     } catch (err) {
       console.error(err);
     }

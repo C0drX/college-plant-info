@@ -81,7 +81,7 @@ function AddPlant() {
 
       alert("Plant added successfully 🌿");
 
-      navigate("/admin");
+      navigate("/admin/dashboard");
     } catch (err) {
       console.error(err);
     }
