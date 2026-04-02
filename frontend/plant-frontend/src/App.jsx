@@ -11,6 +11,8 @@ import { AdminRoute, LoggedInAdminRoute } from "./components/routes/AdminRoute";
 import AdminRegister from "./pages/AdminRegister";
 import ManageAdmins from "./pages/ManageAdmins";
 import PlantNotAVailable from "./pages/PlantNotAvailable";
+import AdminProfile from "./pages/AdminProfile";
+import ForgotPassword from "./pages/ForgotPassword";
 
 function App() {
   return (
@@ -38,6 +40,15 @@ function App() {
         />
 
         <Route
+          path="/admin/forgot-password"
+          element={
+            <LoggedInAdminRoute>
+              <ForgotPassword />
+            </LoggedInAdminRoute>
+          }
+        />
+
+        <Route
           path="/admin/manage-admins"
           element={
             <AdminRoute>
@@ -51,6 +62,15 @@ function App() {
           element={
             <AdminRoute>
               <AdminDashboard />
+            </AdminRoute>
+          }
+        />
+
+        <Route
+          path="/admin/admin-profile"
+          element={
+            <AdminRoute>
+              <AdminProfile />
             </AdminRoute>
           }
         />

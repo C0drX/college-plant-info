@@ -27,7 +27,10 @@ const ScientificDetails = ({ plant }) => {
       <div className="row g-3">
         {details.map((item, index) => (
           <div className="col-md-6" key={index}>
-            <div className="card shadow-sm border-0 h-100">
+            <div
+              className="card shadow-sm border-0 h-100"
+              style={{ borderRadius: "16px", overflow: "hidden" }}
+            >
               <div className="card-body text-center">
                 <h6 className="text-muted mb-2">{item.label}</h6>
 

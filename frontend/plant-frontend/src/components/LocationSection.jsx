@@ -5,9 +5,11 @@ const LocationSection = ({ plant }) => {
 
   return (
     <div className="mb-5">
-      <h3 className="mb-4 fw-bold text-success">Plant in College</h3>
-
-      <div className="card shadow-sm border-0 location-card">
+      <div
+        className="card shadow-sm border-0 location-card"
+        style={{ borderRadius: "16px", overflow: "hidden" }}
+      >
+        <h3 className="mb-4 fw-bold text-success">Plant in College</h3>
         <div className="location-wrapper">
           <div className="location-image-box">
             <img src={`${BASE_URL}${collegeImage}`} alt="Plant location" />

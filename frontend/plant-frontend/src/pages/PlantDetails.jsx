@@ -90,7 +90,7 @@ const PlantDetails = () => {
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, margin: "-100px" }}
-        className="mb-5"
+        className="mb-1"
       >
         <CategorySection plant={plant} />
       </motion.div>
@@ -100,7 +100,7 @@ const PlantDetails = () => {
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, margin: "-100px" }}
-        className="mb-5"
+        className="mb-4"
       >
         <AboutSection description={plant.description} plantId={id} />
       </motion.div>
@@ -110,7 +110,7 @@ const PlantDetails = () => {
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, margin: "-100px" }}
-        className="mb-5"
+        className="mb-1"
       >
         <FruitSection plant={plant} />
       </motion.div>
@@ -120,7 +120,7 @@ const PlantDetails = () => {
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, margin: "-100px" }}
-        className="mb-5"
+        className="mb-1"
       >
         <UsesSection uses={plant.uses} plantId={id} />
       </motion.div>
@@ -140,7 +140,7 @@ const PlantDetails = () => {
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, margin: "-100px" }}
-        className="mb-5"
+        className="mb-1"
       >
         <ScientificDetails plant={plant} />
       </motion.div>
@@ -150,7 +150,7 @@ const PlantDetails = () => {
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, margin: "-100px" }}
-        className="mb-5"
+        className="mb-1"
       >
         <LocationSection plant={plant} />
       </motion.div>

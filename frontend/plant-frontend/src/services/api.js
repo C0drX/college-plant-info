@@ -50,3 +50,11 @@ export const adminLogin = (data) => API.post("/admin/login", data);
 export const adminRegister = (data) => API.post("/admin/register", data);
 
 export const generateAdminInvite = (data) => API.post("/admin/generate-invite");
+
+export const updateAdminProfile = async (data) => {
+  return API.post("/admin/update-profile", data);
+};
+
+export const resetAdminPassword = (data) => {
+  return API.post("/admin/reset-password", data);
+};

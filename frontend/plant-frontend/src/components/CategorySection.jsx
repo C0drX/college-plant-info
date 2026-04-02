@@ -1,6 +1,9 @@
 function CategorySection({ plant }) {
   return (
-    <div className="card border-0 shadow-sm mb-4">
+    <div
+      className="card border-0 shadow-sm mb-4"
+      style={{ borderRadius: "16px", overflow: "hidden" }}
+    >
       <div className="card-body">
         <h4 className="mb-3 text-success fw-bold">Category</h4>
 

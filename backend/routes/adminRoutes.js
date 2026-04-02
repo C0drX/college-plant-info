@@ -11,6 +11,8 @@ const {
   generateInvite,
   registerAdmin,
   getAdmins,
+  updateProfile,
+  resetAdminPassword,
 } = require("../controllers/adminController");
 
 /**
@@ -51,5 +53,21 @@ router.post("/register", registerAdmin);
  * Protected route (admin required)
  */
 router.get("/get-admins", getAdmins);
+
+/**
+ * ---------------------------------------------------
+ * Update Admin Profile
+ * ---------------------------------------------------
+ * Protected route (admin required)
+ */
+router.post("/update-profile", verifyAdmin, updateProfile);
+
+/**
+ * ---------------------------------------------------
+ * Reset Admin Password
+ * ---------------------------------------------------
+ * Uses recovery key
+ */
+router.post("/reset-password", resetAdminPassword);
 
 module.exports = router;

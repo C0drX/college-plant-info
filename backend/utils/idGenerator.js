@@ -14,7 +14,7 @@ function generateAdminId() {
  * Example: 7fa91c3b2e
  */
 function generateInviteKey() {
-  return crypto.randomBytes(5).toString("hex");
+  return crypto.randomBytes(5).toString("hex").toUpperCase();
 }
 
 /**

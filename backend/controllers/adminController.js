@@ -268,9 +268,215 @@ async function registerAdmin(req, res) {
   }
 }
 
+async function updateProfile(req, res) {
+  const pool = getPool();
+
+  try {
+    /**
+     * ---------------------------------------------------
+     * Extract Admin ID (from JWT middleware)
+     * ---------------------------------------------------
+     */
+    const adminId = req.admin?.id;
+
+    if (!adminId) {
+      return res.status(401).json({
+        message: "Unauthorized",
+      });
+    }
+
+    /**
+     * ---------------------------------------------------
+     * Extract Body Data
+     * ---------------------------------------------------
+     */
+    const { name, password } = req.body;
+
+    /**
+     * ---------------------------------------------------
+     * Validate Input
+     * ---------------------------------------------------
+     */
+    if (!name && !password) {
+      return res.status(400).json({
+        message: "Nothing to update",
+      });
+    }
+
+    let fields = [];
+    let values = [];
+
+    /**
+     * ---------------------------------------------------
+     * Update Name (if provided)
+     * ---------------------------------------------------
+     */
+    if (name && name.trim() !== "") {
+      fields.push("name = ?");
+      values.push(name.trim());
+    }
+
+    /**
+     * ---------------------------------------------------
+     * Update Password (if provided)
+     * ---------------------------------------------------
+     */
+    if (password && password.trim() !== "") {
+      const passwordHash = await bcrypt.hash(password, 10);
+
+      fields.push("password_hash = ?");
+      values.push(passwordHash);
+    }
+
+    /**
+     * ---------------------------------------------------
+     * If nothing valid to update
+     * ---------------------------------------------------
+     */
+    if (fields.length === 0) {
+      return res.status(400).json({
+        message: "No valid fields to update",
+      });
+    }
+
+    /**
+     * ---------------------------------------------------
+     * Execute Update Query
+     * ---------------------------------------------------
+     */
+    const query = `
+      UPDATE admins
+      SET ${fields.join(", ")}
+      WHERE id = ?
+    `;
+
+    values.push(adminId);
+
+    await pool.query(query, values);
+
+    /**
+     * ---------------------------------------------------
+     * Send Response
+     * ---------------------------------------------------
+     */
+    return res.json({
+      message: "Profile updated successfully",
+    });
+  } catch (error) {
+    console.error("Update profile error:", error);
+
+    return res.status(500).json({
+      message: "Failed to update profile",
+    });
+  }
+}
+
+async function resetAdminPassword(req, res) {
+  const pool = getPool();
+
+  try {
+    /**
+     * ---------------------------------------------------
+     * Extract Request Data
+     * ---------------------------------------------------
+     */
+    const { email, recovery_key, new_password } = req.body;
+
+    /**
+     * ---------------------------------------------------
+     * Basic Validation
+     * ---------------------------------------------------
+     */
+    if (!email || !recovery_key || !new_password) {
+      return res.status(400).json({
+        message: "All fields are required",
+      });
+    }
+
+    /**
+     * ---------------------------------------------------
+     * Fetch Admin By Email
+     * ---------------------------------------------------
+     */
+    const [admins] = await pool.query(
+      "SELECT id, recovery_key_hash, password_hash FROM admins WHERE email = ? AND is_active = 1",
+      [email],
+    );
+
+    if (admins.length === 0) {
+      return res.status(404).json({
+        message: "Admin not found",
+      });
+    }
+
+    const admin = admins[0];
+
+    /**
+     * ---------------------------------------------------
+     * Compare Recovery Key (bcrypt compare)
+     * ---------------------------------------------------
+     */
+    const isValidKey = await bcrypt.compare(
+      recovery_key,
+      admin.recovery_key_hash,
+    );
+
+    if (!isValidKey) {
+      return res.status(400).json({
+        message: "Invalid recovery key",
+      });
+    }
+
+    const isPasswordSame = await bcrypt.compare(
+      new_password,
+      admin.password_hash,
+    );
+
+    if (isPasswordSame) {
+      return res.status(400).json({
+        message: "New password cannot be the same as the current password !",
+      });
+    }
+
+    /**
+     * ---------------------------------------------------
+     * Hash New Password
+     * ---------------------------------------------------
+     */
+    const passwordHash = await bcrypt.hash(new_password, 10);
+
+    /**
+     * ---------------------------------------------------
+     * Update Password In Database
+     * ---------------------------------------------------
+     */
+    await pool.query("UPDATE admins SET password_hash = ? WHERE id = ?", [
+      passwordHash,
+      admin.id,
+    ]);
+
+    /**
+     * ---------------------------------------------------
+     * Send Success Response
+     * ---------------------------------------------------
+     */
+    return res.json({
+      message: "Password reset successful",
+    });
+  } catch (error) {
+    console.error("Reset password error:", error);
+
+    return res.status(500).json({
+      message: "Failed to reset password",
+    });
+  }
+}
+
 module.exports = {
   adminLogin,
   generateInvite,
   registerAdmin,
+  updateProfile,
   getAdmins,
+  resetAdminPassword,
 };

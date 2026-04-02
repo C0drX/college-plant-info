@@ -89,7 +89,10 @@ function AddPlant() {
 
   return (
     <div className="container py-4">
-      <div className="card shadow-lg border-0">
+      <div
+        className="card shadow-lg border-0"
+        style={{ borderRadius: "16px", overflow: "hidden" }}
+      >
         <div className="card-body p-4">
           <h3 className="mb-4 fw-bold text-success">🌿 Add New Plant</h3>
 
