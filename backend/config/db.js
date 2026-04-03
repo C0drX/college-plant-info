@@ -21,11 +21,11 @@ async function connectWithRetry() {
       const conn = await pool.getConnection();
       conn.release();
 
-      console.log("✅ MySQL Pool Connected");
+      console.log("MySQL Pool Connected");
       break;
     } catch (err) {
-      console.error("❌ MySQL connection failed:", err.message);
-      console.log("⏳ Retrying in 5 seconds...\n");
+      console.error("MySQL connection failed:", err.message);
+      console.log("Retrying in 5 seconds...\n");
 
       await new Promise((resolve) => setTimeout(resolve, 5000));
     }

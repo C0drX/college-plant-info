@@ -24,7 +24,7 @@ async function startServer() {
   await connectWithRetry(); // wait until DB ready
 
   app.listen(PORT, () => {
-    console.log(`🚀 Server is up and running on port ${PORT}`);
+    console.log(`Server is up and running on port ${PORT}`);
   });
 }
 

@@ -4,7 +4,7 @@ import { formatText } from "../utils/formatText";
 const AboutSection = ({ description, plantId }) => {
   const [expanded, setExpanded] = useState(false);
 
-  const LIMIT = 600;
+  const LIMIT = 300;
   const showToggle = description.length > LIMIT;
 
   useEffect(() => {
