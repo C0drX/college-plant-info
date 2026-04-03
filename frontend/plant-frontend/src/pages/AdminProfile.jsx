@@ -156,6 +156,7 @@ export default function AdminProfile() {
                   name="password"
                   value={form.password}
                   onChange={handleChange}
+                  minLength={6}
                   autoComplete="new-password"
                 />
               </Form.Group>

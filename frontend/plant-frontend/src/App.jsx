@@ -32,10 +32,16 @@ function App() {
         <Route path="/admin/add" element={<AddPlant />} />
         <Route path="/admin/edit/:id" element={<EditPlant />} />
 
-        <Route path="/admin/register" element={<AdminRegister />} />
-
         <Route path="/plant-not-available" element={<PlantNotAVailable />} />
 
+        <Route
+          path="/admin/register"
+          element={
+            <LoggedInAdminRoute>
+              <AdminRegister />
+            </LoggedInAdminRoute>
+          }
+        />
         <Route
           path="/admin/login"
           element={

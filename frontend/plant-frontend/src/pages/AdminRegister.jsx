@@ -126,7 +126,8 @@ function AdminRegister() {
                 <h4 className="my-3">{recoveryKey}</h4>
 
                 <p className="small mb-3">
-                  This will not be shown again. Keep it safe.
+                  This will be used to recover your account if you forget your
+                  password. This will not be shown again. Keep it safe.
                 </p>
 
                 <button
