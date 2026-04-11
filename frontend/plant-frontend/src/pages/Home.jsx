@@ -12,6 +12,7 @@ function Home() {
 
   const loadPlants = async () => {
     try {
+      console.log("API_URL:", import.meta.env.VITE_API_URL);
       const res = await getPlants();
       const activePlants = res.data.filter((plant) => plant.is_active);
       setPlants(activePlants);

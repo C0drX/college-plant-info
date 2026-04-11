@@ -1,0 +1,38 @@
+version: "3.9"
+
+services:
+  mysql:
+    image: mysql:8
+    container_name: mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: R!o@2026
+      MYSQL_DATABASE: college_plants
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  backend:
+    build: ./backend
+    container_name: backend
+    restart: always
+    env_file:
+      - backend/.env
+    volumes:
+      - ./backend/images:/app/images
+      - ./backend/qrcodes:/app/qrcodes
+      - ./backend/assets:/app/assets
+    depends_on:
+      - mysql
+
+  nginx:
+    build:
+      context: .
+      dockerfile: ./nginx/Dockerfile
+    container_name: nginx
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
+volumes:
+  mysql_data:

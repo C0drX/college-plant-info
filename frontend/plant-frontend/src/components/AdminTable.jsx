@@ -33,7 +33,7 @@ function AdminTable({ data }) {
   );
 
   // 🔥 current logged in admin
-  const currentAdmin = JSON.parse(localStorage.getItem("admin") || "null");
+  const currentAdmin = JSON.parse(sessionStorage.getItem("admin") || "null");
 
   return (
     <div

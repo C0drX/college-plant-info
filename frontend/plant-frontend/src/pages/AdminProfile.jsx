@@ -37,7 +37,7 @@ export default function AdminProfile() {
 
   // Load admin
   useEffect(() => {
-    const stored = JSON.parse(localStorage.getItem("admin") || "null");
+    const stored = JSON.parse(sessionStorage.getItem("admin") || "null");
     if (stored) {
       setAdmin(stored);
       setForm((prev) => ({
@@ -81,13 +81,13 @@ export default function AdminProfile() {
         password: isPasswordEntered ? form.password : undefined,
       });
 
-      // ✅ Update localStorage
+      // ✅ Update sessionStorage
       const updatedAdmin = {
         ...admin,
         name: isNameChanged ? form.name : admin.name,
       };
 
-      localStorage.setItem("admin", JSON.stringify(updatedAdmin));
+      sessionStorage.setItem("admin", JSON.stringify(updatedAdmin));
       setAdmin(updatedAdmin);
 
       // reset password fields

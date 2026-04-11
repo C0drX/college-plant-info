@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { getPlants, deletePlant, restorePlant } from "../services/api";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import PlantList from "../components/PlantList";
 import QrModal from "../components/modals/QrModal";
 import {
@@ -26,7 +26,9 @@ function AdminDashboard() {
   const [showErrorMessage, setShowErrorMessage] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
 
-  const admin = JSON.parse(localStorage.getItem("admin"));
+  const admin = JSON.parse(sessionStorage.getItem("admin"));
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     loadAdmins();
@@ -92,9 +94,9 @@ function AdminDashboard() {
   };
 
   const logout = () => {
-    localStorage.removeItem("admin_token");
-    localStorage.removeItem("admin");
-    window.location.href = "/admin/login";
+    sessionStorage.removeItem("admin_token");
+    sessionStorage.removeItem("admin");
+    navigate("/admin/login", { replace: true });
   };
 
   const activePlants = plants.filter((p) => p.is_active).length;

@@ -7,7 +7,7 @@ const generatePlantQR = (plantId) => {
     const fileName = `plant-${plantId}.png`;
     const qrPath = path.join(__dirname, "..", "qrcodes", fileName);
 
-    const command = `python services/generate_qr.py "${plantURL}" "${qrPath}" "./assets/leaf.png"`;
+    const command = `python3 services/generate_qr.py "${plantURL}" "${qrPath}" "./assets/leaf.png"`;
     exec(command, (error, stdout, stderr) => {
       if (error) {
         console.error("❌ Python error:", error);

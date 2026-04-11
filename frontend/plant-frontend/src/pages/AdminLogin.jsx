@@ -18,8 +18,8 @@ function AdminLogin() {
 
       const token = res.data.token;
 
-      localStorage.setItem("admin_token", token);
-      localStorage.setItem("admin", JSON.stringify(res.data.admin));
+      sessionStorage.setItem("admin_token", token);
+      sessionStorage.setItem("admin", JSON.stringify(res.data.admin));
 
       navigate("/admin/dashboard");
     } catch (err) {
