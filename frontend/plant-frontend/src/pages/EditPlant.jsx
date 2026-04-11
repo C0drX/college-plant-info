@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getPlantById, updatePlant } from "../services/api";
 import { BASE_URL } from "../config/server";
-import { CustomModal } from "../components/modals/CustomModal";
+import { CustomModal, LoaderModal } from "../components/modals/CustomModal";
 
 import FormInput from "../components/FormInput";
 import FormTextarea from "../components/FormTextArea";
@@ -15,6 +15,7 @@ function EditPlant() {
 
   const [originalForm, setOriginalForm] = useState(null);
   const [showDeletedModal, setShowDeletedModal] = useState(false);
+  const [showLoader, setShowLoader] = useState(false);
 
   const [form, setForm] = useState({
     common_name: "",
@@ -145,6 +146,7 @@ function EditPlant() {
     if (images.college) formData.append("college", images.college);
 
     try {
+      setShowLoader(true);
       await updatePlant(id, formData);
 
       alert("Plant updated successfully 🌿");
@@ -152,11 +154,14 @@ function EditPlant() {
       navigate("/admin/dashboard");
     } catch (err) {
       console.error(err);
+    } finally {
+      setShowLoader(false);
     }
   };
 
   return (
     <div className="container py-4">
+      <LoaderModal show={showLoader} text="Updating plant..." />
       <div
         className="card shadow-lg border-0"
         style={{ borderRadius: "16px", overflow: "hidden" }}

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { addPlant } from "../services/api";
-
+import { LoaderModal } from "../components/modals/CustomModal";
 import FormInput from "../components/FormInput";
 import FormTextarea from "../components/FormTextArea";
 import ImageUpload from "../components/ImageUpload";
@@ -9,6 +9,8 @@ import CategoryDropdown from "../components/CategoryDropdown";
 
 function AddPlant() {
   const navigate = useNavigate();
+
+  const [showLoader, setShowLoader] = useState(false);
 
   const [form, setForm] = useState({
     common_name: "",
@@ -77,6 +79,8 @@ function AddPlant() {
     if (images.college) formData.append("college", images.college);
 
     try {
+      setShowLoader(true);
+
       await addPlant(formData);
 
       alert("Plant added successfully 🌿");
@@ -84,11 +88,14 @@ function AddPlant() {
       navigate("/admin/dashboard");
     } catch (err) {
       console.error(err);
+    } finally {
+      setShowLoader(false);
     }
   };
 
   return (
     <div className="container py-4">
+      <LoaderModal show={showLoader} text="Adding plant..." />
       <div
         className="card shadow-lg border-0"
         style={{ borderRadius: "16px", overflow: "hidden" }}

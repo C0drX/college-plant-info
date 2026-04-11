@@ -218,11 +218,13 @@ exports.updatePlant = async (req, res) => {
       ],
     );
 
+    const fs = require("fs").promises;
+
     const processImage = async (file, type) => {
       const ext = path.extname(file.originalname);
-      const newName = `plant-${id}-${type}${ext}`;
 
       const oldPath = path.join(__dirname, "..", "images", file.filename);
+      const newName = `plant-${id}-${type}${ext}`;
       const newPath = path.join(__dirname, "..", "images", newName);
 
       await fs.rename(oldPath, newPath);
@@ -245,6 +247,7 @@ exports.updatePlant = async (req, res) => {
     delete cache[id];
   } catch (err) {
     res.status(500).json(err);
+    console.log(err);
   }
 };
 
